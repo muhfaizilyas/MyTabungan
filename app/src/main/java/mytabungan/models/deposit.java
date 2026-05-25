@@ -1,5 +1,7 @@
 package mytabungan.models;
 
-public class deposit {
-    
+public class Deposit {
+    // Riskia
+    // menyimpan data transaksi tabungan
+    // wadah object data
 }

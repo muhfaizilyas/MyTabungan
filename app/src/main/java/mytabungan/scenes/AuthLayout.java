@@ -21,7 +21,7 @@ public class AuthLayout {
         panel.setMaxWidth(Double.MAX_VALUE);
         panel.setStyle("-fx-background-color: #001F3F; -fx-padding: 50 40 50 40;");
 
-        var logoApp = LoginScene.class.getResourceAsStream("/images/logo-Tabungin.png");
+        var logoApp = LoginScene.class.getResourceAsStream("/images/tabunginAja.png");
         if (logoApp == null) {
             throw new RuntimeException("Logo tidak ditemukan.");
         }
