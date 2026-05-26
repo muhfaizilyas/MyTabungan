@@ -11,6 +11,7 @@ public class App  extends Application{
 
     @Override
     public void start(Stage primaryStage) {
+        // DBIniatializer.init(); // Untuk buat tabel di database
 
         LoginScene loginScene = new LoginScene(primaryStage);
         primaryStage.setScene(loginScene.getLogin(primaryStage));
@@ -25,7 +26,7 @@ public class App  extends Application{
         // } catch (SQLException e) {
         //     System.out.println("Koneksi gagal!");
 
-        //     e.printStackTrace();
+        //     e.printStackTrace();.\gradlew run
         // }
         launch(args);
     }
