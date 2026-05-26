@@ -1,6 +1,6 @@
 package mytabungan.models;
 
-public class deposit {
+public class Deposit {
     private int id;
     private int userId;
     private String savingType;
@@ -8,7 +8,7 @@ public class deposit {
     private double amount;
     private String createdAt;
 
-    public deposit(int id, int userId, String savingType, int referenceId, double amount, String createdAt) {
+    public Deposit(int id, int userId, String savingType, int referenceId, double amount, String createdAt) {
         this.id = id;
         this.userId = userId;
         this.savingType = savingType;
