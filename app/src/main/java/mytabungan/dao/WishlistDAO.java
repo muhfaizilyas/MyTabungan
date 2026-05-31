@@ -3,34 +3,31 @@ package mytabungan.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import mytabungan.database.DatabaseConfig;
 import mytabungan.models.Wishlist;
 
 public class WishlistDAO {
 
-    public Wishlist getWishlistByUserId(int userId) {
-        String sql = "SELECT * FROM wishlists WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
+    //  Ambil semua wishlist milik user (status ONGOING) 
+    public List<Wishlist> getWishlistsByUserId(int userId) {
+        String sql = "SELECT * FROM wishlists WHERE user_id = ? AND status = 'ONGOING' ORDER BY created_at ASC";
+        List<Wishlist> list = new ArrayList<>();
+
         try (Connection conn = DatabaseConfig.connect();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return new Wishlist(
-                    rs.getInt("id"),
-                    rs.getInt("user_id"),
-                    rs.getString("title"),
-                    rs.getDouble("target_price"),
-                    rs.getDouble("saved_amount"),
-                    rs.getDouble("max_limit"),
-                    rs.getString("status"),
-                    rs.getString("period"),
-                    rs.getTimestamp("created_at").toLocalDateTime()
-                );
+
+            while (rs.next()) {
+                list.add(mapRow(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return list;
     }
-}
