@@ -599,6 +599,9 @@ public class TabunganScene {
         Dialog<MonthlySaving> dialog = new Dialog<>();
         dialog.setTitle("Mari mulai Menabung!");
         dialog.setHeaderText("Tentukan target bulan ini");
+        dialog.getDialogPane().getStylesheets().add(
+            Sidebar.class.getResource("/style.css").toExternalForm()
+        );
         dialog.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> e.consume()); // agar tidak bisa ditutup
 
         TextField inputField = new TextField();
@@ -615,6 +618,7 @@ public class TabunganScene {
         ButtonType simpanType = new ButtonType("Simpan", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().add(simpanType);
         Button simpanBtn = (Button) dialog.getDialogPane().lookupButton(simpanType);
+        simpanBtn.getStyleClass().add("buttonOK");
         simpanBtn.disableProperty().bind(inputField.textProperty().isEmpty());
 
         MonthlySaving[] resultHolder = {null};

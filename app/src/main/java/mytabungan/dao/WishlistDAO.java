@@ -164,21 +164,6 @@ import mytabungan.models.Wishlist;
             return false;
         }
 
-        public boolean addToWishlistSaving(int wishlistId, double amount) {
-            String sql = "UPDATE wishlists SET saved_amount = saved_amount + ? WHERE id = ?";
-            try (Connection conn = DatabaseConfig.connect();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-                stmt.setDouble(1, amount);
-                stmt.setInt(2, wishlistId);
-                return stmt.executeUpdate() > 0;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
         //  Hitung total persen alokasi dari semua wishlist ONGOING milik user
         public double getTotalMaxLimitByUserId(int userId) {
             String sql = "SELECT SUM(max_limit) FROM wishlists WHERE user_id = ? AND status = 'ONGOING'";
