@@ -1,136 +1,97 @@
 # Tabungin
-**Proyek Akhir Lab PBO 2026 - Kelompok 24**
+# Final Project OOP Lab 2026 - Group 24
 
-Tabungin adalah aplikasi desktop manajemen tabungan pribadi berbasis Java (JavaFX) yang membantu warga mengelola keuangan mereka secara terstruktur — mulai dari tabungan bulanan, wishlist, hingga deposit.
-
-## Prasyarat
-
-Pastikan sudah terinstal:
-- **Java JDK**
-- **Gradle** (atau gunakan `gradlew` bawaan proyek)
-- **XAMPP** (untuk menjalankan MySQL secara lokal)
+## Prerequisites
+Make sure the following software is installed:
+* **Java JDK**
+* **Gradle** (or use the included `gradlew` wrapper)
+* **XAMPP** (to run a local MySQL server)
 
 ## Setup Database (Local MySQL via XAMPP)
+This project uses a local MySQL database to store user data, savings records, wishlist items, and transactions.
 
-Project ini menggunakan MySQL lokal. Konfigurasi koneksi ada pada `app/src/main/resources/db.properties`, sedangkan semua inisialisasi tabel ada pada `app/src/main/java/mytabungan/database/DBIniatializer.java`.
+### File Locations
+Database connection settings can be found in:
+*database/DatabaseConfig.java*
 
-### Langkah 1 — Jalankan XAMPP
-1. Buka **XAMPP Control Panel**
-2. Klik **Start** pada modul **Apache** dan **MySQL**
-3. Pastikan keduanya berstatus **Running** (ditandai warna hijau)
+All database table initialization settings can be found in:
+*database/DBInitializer.java*
 
-### Langkah 2 — Buat Database
-1. Buka browser, akses `http://localhost/phpmyadmin`
-2. Klik tab **SQL** di bagian atas
-3. Jalankan perintah berikut:
+### Create Database
+1. Open your browser and access `http://localhost/phpmyadmin`
+2. Click the **SQL** tab at the top
+3. Execute the following command:
 ```sql
 CREATE DATABASE tabungin;
 ```
-4. Pastikan database `tabungin` sudah muncul di panel kiri
+4. Make sure the `tabungin` database appears in the left panel.
 
-### Langkah 3 — Konfigurasi Koneksi
-1. Salin file contoh konfigurasi: `db.properties.example` → `db.properties`
-2. Isi file `db.properties` sesuai pengaturan MySQL lokal:
+### Configure Database Connection
+1. Create a `db.properties` file by copying `db.properties.example` using the following command:
 ```properties
-DB_URL=jdbc:mysql://localhost:3306/tabungin
-DB_USER=root
-DB_PASSWORD=
+copy db.properties.example db.properties
 ```
-> Secara default XAMPP menggunakan user `root` tanpa password. Sesuaikan jika menggunakan password berbeda.
+> Make sure you run this command from the correct directory (*MyTabungan\app\src\main\resources*).
 
-### Langkah 4 — Buat Tabel
+2. Update the values of **DB_USER** and **DB_PASSWORD** according to your local MySQL configuration.
+> By default, XAMPP uses the `root` user without a password. Adjust the configuration if your MySQL installation uses a different password.
 
-Tabel akan **dibuat otomatis** saat aplikasi pertama kali dijalankan melalui `DBIniatializer.init()` yang dipanggil di `App.java`. Tabel yang akan dibuat:
+### Create Tables
+All tables will be **created automatically** when the application is run for the first time through `DBInitializer.init()`, which is called from `App.java`.
+Therefore, make sure `DBInitializer.init()` (line 15) is not commented out.
 
-#### Tabel `users`
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | INT AUTO_INCREMENT | Primary key |
-| username | VARCHAR(50) | Unik, tidak boleh kosong |
-| email | VARCHAR(100) | Email pengguna |
-| password | VARCHAR(255) | Disimpan dalam bentuk hash (BCrypt) |
-| created_at | TIMESTAMP | Waktu registrasi |
+#### Notes
+* Run the application once to allow all tables to be created automatically.
+* If you encounter a `database doesn't exist` error, make sure the `tabungin` database has already been created.
+* If you need to modify the database schema, update `DBInitializer.java` and remove the old tables through phpMyAdmin before running the application again.
+* After the tables are successfully created, verify them through phpMyAdmin. You should see the following tables:
+  * `users`
+  * `tabungan_utama`
+  * `wishlists`
+  * `deposits`
 
-#### Tabel `tabungan_utama`
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | INT AUTO_INCREMENT | Primary key |
-| user_id | INT | Foreign key ke `users` |
-| target_amount | DECIMAL(12,2) | Target tabungan |
-| saved_amount | DECIMAL(12,2) | Jumlah yang sudah ditabung |
-| period_month | VARCHAR(20) | Periode bulan tabungan |
-| created_at | TIMESTAMP | Waktu dibuat |
-
-#### Tabel `wishlists`
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | INT AUTO_INCREMENT | Primary key |
-| user_id | INT | Foreign key ke `users` |
-| title | VARCHAR(100) | Nama wishlist |
-| target_price | DECIMAL(12,2) | Harga target |
-| saved_amount | DECIMAL(12,2) | Dana yang sudah terkumpul |
-| max_limit | DECIMAL(12,2) | Batas maksimal alokasi (%) |
-| status | VARCHAR(20) | `ONGOING` / `DONE` |
-| period | VARCHAR(20) | Periode wishlist |
-| created_at | TIMESTAMP | Waktu dibuat |
-
-#### Tabel `deposits`
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | INT AUTO_INCREMENT | Primary key |
-| user_id | INT | Foreign key ke `users` |
-| saving_type | VARCHAR(20) | Jenis tabungan |
-| reference_id | INT | ID referensi ke tabel terkait |
-| amount | DECIMAL(12,2) | Jumlah deposit |
-| created_at | TIMESTAMP | Waktu deposit |
-
-#### Catatan
-- Jalankan aplikasi satu kali agar semua tabel terbuat otomatis.
-- Apabila muncul error `database doesn't exist`, pastikan database `tabungin` sudah dibuat terlebih dahulu.
-- Apabila ingin mengubah struktur tabel, edit `DBIniatializer.java` lalu hapus tabel lama melalui phpMyAdmin sebelum menjalankan ulang.
-- Setelah tabel berhasil dibuat, verifikasi melalui phpMyAdmin — seharusnya terdapat 4 tabel: `users`, `tabungan_utama`, `wishlists`, `deposits`.
-
-## Cara Menjalankan Program
-
-Pastikan XAMPP sudah berjalan dan `db.properties` sudah dikonfigurasi, lalu jalankan di terminal:
-
+## How to Run the Application
+Make sure XAMPP is running (Apache and MySQL services are active) and db.properties has been configured correctly, then run the following command in the terminal:
 ```bash
-
 ./gradlew run
 #or
 gradlew run
 ```
 
 ## Deskripsi Aplikasi
+**Tabungin** is a JavaFX-based personal savings management application designed to help users plan and monitor their financial goals in a structured way.
+The application allows users to create monthly savings targets, record deposit transactions, manage multiple wishlists with customizable allocation percentages, and track their progress in real time. In addition, Tabungin provides a Growth feature that displays savings statistics, user levels, achievements, and visualizations of saving activities as a form of gamification to encourage users to maintain consistent saving habits.
+Main features available:
+- Create and monitor monthly savings with specific targets
+- Manage wishlists and allocate funds toward desired items
+- Record deposit transactions regularly
+- Visualize savings growth and progress
+- Login and registration with secure authentication using BCrypt password hashing
 
-**Tabungin** adalah aplikasi manajemen tabungan pribadi yang dirancang untuk membantu pengguna mengelola keuangan sehari-hari. Fitur yang tersedia:
-- Membuat dan memantau **tabungan bulanan** dengan target tertentu
-- Mengelola **wishlist** barang yang ingin dibeli beserta alokasi dananya
-- Mencatat **deposit** secara berkala
-- Melihat **pertumbuhan tabungan** secara visual
-- Login dan registrasi dengan sistem autentikasi yang aman (password di-hash menggunakan BCrypt)
+## Application Concept
+Tabungin applies a goal-based saving concept, a saving method where users save money according to specific financial goals they want to achieve. Each wishlist has its own target amount and allocation percentage from the main savings fund, allowing users to manage multiple financial goals simultaneously while maintaining clear visibility of their overall saving progress.
 
-## Struktur Folder
-
+## Folder Structure
+The project is organized into several packages based on their responsibilities:
 ```
 app/src/main/java/mytabungan/
-├── App.java                  # Entry point aplikasi JavaFX
-├── dao/                      # Data Access Object — operasi database
+├── App.java                  # JavaFX application entry point
+├── dao/                      # Data Access Object: database operations
 │   ├── UserDAO.java
 │   ├── SavingDAO.java
 │   ├── DepositDAO.java
 │   └── WishlistDAO.java
-├── database/                 # Konfigurasi dan inisialisasi database
-│   ├── DatabaseConfig.java   # Koneksi ke MySQL via db.properties
-│   └── DBIniatializer.java   # Pembuatan tabel otomatis
-├── models/                   # Model data (representasi tabel)
+├── database/                 # Database configuration and initialization
+│   ├── DatabaseConfig.java   # Connecting to MySQL via db.properties
+│   └── DBIniatializer.java   # Automatic table generation
+├── models/                   # Data model (table representation)
 │   ├── User.java
 │   ├── Saving.java           # Abstract base class
 │   ├── MonthlySaving.java    # Extends Saving
 │   ├── Wishlist.java         # Extends Saving
 │   └── Deposit.java
-├── scenes/                   # Tampilan UI (JavaFX Scene)
-│   ├── AuthLayout.java       # Panel kiri yang dipakai Login & Register
+├── scenes/                   # User Interface (JavaFX Scene)
+│   ├── AuthLayout.java       # The left panel used for Login & Register
 │   ├── LoginScene.java
 │   ├── RegisterScene.java
 │   ├── MainScene.java
@@ -138,37 +99,34 @@ app/src/main/java/mytabungan/
 │   ├── WishlistScene.java
 │   ├── GrowthScene.java
 │   └── Sidebar.java
-└── utils/                    # Utilitas umum
-    ├── ValidationUtil.java   # Validasi input (email, password, username)
-    ├── SessionManager.java   # Manajemen sesi user yang sedang login
-    └── PasswordUtil.java     # Hash & verifikasi password (BCrypt)
+└── utils/                    # Public utilities
+    ├── ValidationUtil.java   # Input validation (email, password, username)
+    ├── SessionManager.java   # Management of currently logged-in users
+    └── PasswordUtil.java     # Password hashing and verification (BCrypt)
 ```
 
-## Struktur Kode
-
+## Code Structure
 ### Entry Point
-`App.java` adalah kelas utama yang meng-extend `Application` (JavaFX). Saat dijalankan, ia memanggil `DBIniatializer.init()` untuk memastikan semua tabel sudah ada, lalu menampilkan `LoginScene`.
+`App.java` serves as the main JavaFX application class. When the application starts, it initially displays the `LoginScene`.
+### Authentication Flow
+1. The user opens the application and is presented with the `LoginScene`
+2. If the user does not have an account, they can navigate to the `RegisterScene`
+3. After a successful login, `SessionManager.login(user)` stores the current user session.
+4. The application navigates to the `MainScene`, which contains the main navigation sidebar.
 
-### Alur Autentikasi
-1. Pengguna membuka aplikasi → `LoginScene`
-2. Apabila belum memiliki akun → navigasi ke `RegisterScene`
-3. Setelah login berhasil → `SessionManager.login(user)` menyimpan sesi
-4. Navigasi ke `MainScene` dengan sidebar navigasi
+### DAO Pattern
+Each database table has its own DAO class responsible for handling CRUD operations using a connection provided by `DatabaseConfig.connect()`.
 
-### Pola DAO
-Setiap tabel memiliki kelas DAO tersendiri yang menangani operasi CRUD menggunakan koneksi dari `DatabaseConfig.connect()`.
+### Database Configuration
+Database connection settings are loaded from the `db.properties` file instead of being hardcoded, making the application easier to configure across different environments without modifying the source code.
 
-### Konfigurasi Database
-Koneksi dibaca dari file `db.properties` (tidak di-hardcode) sehingga mudah disesuaikan per environment tanpa mengubah kode.
-
-## Penerapan Pilar OOP (Object Oriented Programming)
+## OOP (Object Oriented Programming) Principles Implementation
 
 ### 1. Encapsulation
-**Lokasi:** `app/src/main/java/mytabungan/models/`
+**Location:** `app/src/main/java/mytabungan/models/`
+All fields within model classes are declared as private, preventing direct access from outside the class. Data can only be accessed through the provided getter methods.
 
-Seluruh field pada kelas model dideklarasikan sebagai `private` sehingga tidak dapat diakses langsung dari luar kelas. Akses hanya diperbolehkan melalui method getter yang telah disediakan.
-
-**Contoh pada `User.java`:**
+**Example in `User.java`:**
 ```java
 private int id;
 private String username;
@@ -180,7 +138,7 @@ public String getUsername(){ return username; }
 public String getEmail()   { return email; }
 ```
 
-**Contoh pada `Saving.java`:**
+**Example in `Saving.java`:**
 ```java
 private int id;
 private int userId;
@@ -192,30 +150,29 @@ public double getTargetAmount(){ return targetAmount; }
 public double getSavedAmount() { return savedAmount; }
 ```
 
-Field `targetAmount` dan `savedAmount` dideklarasikan `protected` agar dapat diakses langsung oleh subclass (`MonthlySaving`, `Wishlist`) tanpa perlu melewati getter, sementara tetap tersembunyi dari kelas luar.
+In `Saving.java`, the fields `targetAmount` and `savedAmount` are declared as `protected` so that subclasses (`MonthlySaving` and `Wishlist`) can access them directly while still keeping them hidden from external classes.
 
-Encapsulation juga diterapkan pada `DatabaseConfig.java` — detail koneksi (URL, user, password) dibaca secara internal dari `db.properties` dan tidak diekspos ke kelas lain selain melalui method `connect()`.
+Encapsulation is also applied in `DatabaseConfig.java`, where database connection details (URL, username, and password) are loaded internally from `db.properties` and are only exposed through the `connect()` method.
 
 ### 2. Inheritance
-**Lokasi:** `app/src/main/java/mytabungan/models/`
+**Location:** `app/src/main/java/mytabungan/models/`
+`MonthlySaving` and `Wishlist` are subclasses that extend the abstract class `Saving`. Through inheritance, both subclasses can reuse common attributes and methods defined in `Saving` without duplicating code.
 
-`MonthlySaving` dan `Wishlist` merupakan subclass yang meng-extend kelas abstrak `Saving`. Dengan pewarisan ini, kedua subclass tidak perlu mendefinisikan ulang field dan method umum yang sudah ada di `Saving`.
-
-**Hierarki pewarisan:**
+**Inheritance hierarchy:**
 ```
 Saving  (abstract)
 ├── MonthlySaving
 └── Wishlist
 ```
 
-**Field yang diwarisi dari `Saving.java`:**
+**Field inherited from `Saving.java`:**
 ```java
 protected double targetAmount;
 protected double savedAmount;
-// beserta: id, userId, createdAt
+// including: id, userId, createdAt
 ```
 
-**Method yang diwarisi dari `Saving.java`:**
+**Method inherited from `Saving.java`:**
 ```java
 public int getId()
 public int getUserId()
@@ -224,7 +181,7 @@ public double getSavedAmount()
 public LocalDateTime getCreatedAt()
 ```
 
-**Contoh pewarisan pada `MonthlySaving.java`:**
+**An example of inheritance in `MonthlySaving.java`:**
 ```java
 public class MonthlySaving extends Saving {
     private String periodMonth;
@@ -238,7 +195,7 @@ public class MonthlySaving extends Saving {
 }
 ```
 
-**Contoh pewarisan pada `Wishlist.java`:**
+**An example of inheritance in `Wishlist.java`:**
 ```java
 public class Wishlist extends Saving {
     private String title;
@@ -252,20 +209,21 @@ public class Wishlist extends Saving {
     }
 }
 ```
+This inheritance structure promotes code reuse and simplifies maintenance by centralizing common saving-related functionality within a single base class.
 
 ### 3. Polymorphism
-**Lokasi:** `app/src/main/java/mytabungan/models/`
+**Location:** `app/src/main/java/mytabungan/models/`
+Polymorphism is implemented through the abstract methods `isReached()`, `getRemaining()`, and `getProgressPercentage()` declared in `Saving` and overridden by both `MonthlySaving` and `Wishlist`.
+Although the methods share the same signatures, each subclass provides its own implementation according to its business logic and context. This allows objects of different subclasses to be treated as instances of `Saving` while still executing their respective implementations at runtime.
 
-Tiga method abstrak yang dideklarasikan di `Saving.java` diimplementasikan secara berbeda oleh masing-masing subclass sesuai dengan logika bisnis yang berlaku.
-
-**Deklarasi di `Saving.java` (abstract):**
+**Declaration at `Saving.java` (abstract):**
 ```java
 public abstract boolean isReached();
 abstract double getRemaining();
 abstract double getProgressPercentage();
 ```
 
-**Implementasi di `MonthlySaving.java`:**
+**Implementation in `MonthlySaving.java`:**
 ```java
 @Override
 public boolean isReached() {
@@ -284,7 +242,7 @@ public double getProgressPercentage() {
 }
 ```
 
-**Implementasi di `Wishlist.java`:**
+**Implementation in `Wishlist.java`:**
 ```java
 @Override
 public boolean isReached() {
@@ -303,7 +261,7 @@ public double getProgressPercentage() {
 }
 ```
 
-`Wishlist` juga memiliki method tambahan `calculateAllocation()` yang tidak dimiliki `MonthlySaving`, menunjukkan bahwa setiap subclass dapat memiliki perilaku yang spesifik terhadap jenisnya:
+Additionally, `Wishlist` provides a specific method called `calculateAllocation()` that does not exist in `MonthlySaving`, demonstrating that subclasses can introduce behavior unique to their own domain requirements.
 ```java
 // Wishlist.java
 public double calculateAllocation(double totalSaving) {
@@ -312,36 +270,35 @@ public double calculateAllocation(double totalSaving) {
 ```
 
 ### 4. Abstraction
-**Lokasi:** `app/src/main/java/mytabungan/models/Saving.java`
-
-Kelas `Saving` dideklarasikan sebagai `abstract class`, artinya kelas ini tidak dapat diinstansiasi secara langsung. Ia berfungsi sebagai kontrak (blueprint) yang memaksa semua subclass untuk mengimplementasikan method-method inti.
+**Location:** `app/src/main/java/mytabungan/models/Saving.java`
+`Saving` is declared as an abstract class, meaning it cannot be instantiated directly. Instead, it acts as a blueprint that defines common attributes and behaviors shared by all saving-related entities.
 
 ```java
 public abstract class Saving {
-    // Atribut umum semua jenis tabungan
+    // General features of all types of savings
     private int id;
     private int userId;
     protected double targetAmount;
     protected double savedAmount;
     protected LocalDateTime createdAt;
 
-    // Method umum yang langsung diwarisi
+    // A general method that is directly inherited
     public int getId() { ... }
     public double getTargetAmount() { ... }
     public double getSavedAmount() { ... }
 
-    // Kontrak abstrak — wajib diimplementasikan oleh subclass
+    // An abstract contract must be implemented by a subclass
     public abstract boolean isReached();
     abstract double getRemaining();
     abstract double getProgressPercentage();
 }
 ```
 
-Abstraksi juga diterapkan pada lapisan DAO. Setiap DAO (`UserDAO`, `SavingDAO`, `WishlistDAO`, `DepositDAO`) menyembunyikan seluruh detail query SQL dari lapisan UI (scenes). Scene hanya perlu memanggil method tanpa perlu mengetahui bagaimana query dieksekusi di dalam.
+Abstraction is also applied within the DAO layer. Classes such as `UserDAO`, `SavingDAO`, `WishlistDAO`, and `DepositDAO` encapsulate all SQL-related logic, allowing UI classes (Scenes) to interact with the database through simple method calls without needing to understand the underlying SQL queries or database operations.
 
-**Contoh pada `UserDAO.java`:**
+**Example in `UserDAO.java`:**
 ```java
-// Dipanggil dari LoginScene.java — scene tidak mengetahui detail SQL-nya
+// Called from LoginScene.java — the scene is not aware of the SQL details
 public User login(String usernameOrEmail, String password) { ... }
 public boolean register(User user) { ... }
 public boolean isEmailExists(String email) { ... }

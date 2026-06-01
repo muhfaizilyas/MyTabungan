@@ -39,20 +39,6 @@ public class DBIniatializer {
                 + "FOREIGN KEY (user_id) REFERENCES users(id)"
             + ");";
 
-        // String createChallengesTable =
-        //     "CREATE TABLE IF NOT EXISTS challenges ("
-        //         + "id INT PRIMARY KEY AUTO_INCREMENT,"
-        //         + "user_id INT NOT NULL,"
-        //         + "title VARCHAR(100) NOT NULL,"
-        //         + "estimated_saving DECIMAL(12,2) DEFAULT 0,"
-        //         + "status VARCHAR(20) DEFAULT 'ONGOING',"
-        //         + "streak INT DEFAULT 0,"
-        //         + "start_date DATE,"
-        //         + "end_date DATE,"
-        //         + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-        //         + "FOREIGN KEY (user_id) REFERENCES users(id)"
-        //     + ");";
-
         String createDepositsTable =
             "CREATE TABLE IF NOT EXISTS deposits ("
                 + "id INT PRIMARY KEY AUTO_INCREMENT,"
@@ -64,10 +50,9 @@ public class DBIniatializer {
                 + "FOREIGN KEY (user_id) REFERENCES users(id)"
             + ");";
 
-
         try (Connection conn = DatabaseConfig.connect();
         Statement statement = conn.createStatement()) {
-
+            
             statement.execute(createUsersTable);
             statement.execute(createMonthlySavings);
             statement.execute(createWishlistTable);

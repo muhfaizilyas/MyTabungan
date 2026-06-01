@@ -12,17 +12,20 @@ public class UserStats {
     private int depositCount;
     private double averageDeposit;
     private List<Achievement> achievements;
+    private String motivationMessage;
     
     public UserStats( int points, int level, String levelName, int nextLevelPoints, int streak,
-    double totalDeposit, int depositCount, double averageDeposit, List<Achievement> achievements ) {
+    double totalDeposit, int depositCount, double averageDeposit, List<Achievement> achievements, String motivationMessage) {
         this.points = points;
         this.level = level;
         this.levelName = levelName;
+        this.nextLevelPoints = nextLevelPoints;
         this.streak = streak;
         this.totalDeposit = totalDeposit;
         this.depositCount = depositCount;
         this.averageDeposit = averageDeposit;
         this.achievements = achievements;
+        this.motivationMessage = motivationMessage;
     }
 
     public int getPoints() {
@@ -59,5 +62,19 @@ public class UserStats {
 
     public List<Achievement> getAchievements() {
         return achievements;
+    }
+
+    public String getMotivationMessage() {
+        return motivationMessage;
+    }
+
+    public double getLevelProgress() {
+        switch (level) {
+            case 1: return points / 500.0;
+            case 2: return (points - 500) / 500.0;
+            case 3: return (points - 1000) / 1000.0;
+            case 4: return (points - 2000) / 1500.0; 
+            default: return 1.0;
+        }
     }
 }
