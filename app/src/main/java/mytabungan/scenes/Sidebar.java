@@ -43,7 +43,7 @@ public class Sidebar {
         Button[] navButtons = { tabunganButton, wishlistButton, growthButton };
 
         VBox menuBox = new VBox(8, tabunganButton, wishlistButton, growthButton);
-        menuBox.setStyle("-fx-padding: 10 16 10 16;");
+        menuBox.setStyle("-fx-padding: 6 14 6 14;");
 
         setActive(tabunganButton, navButtons);
         root.setCenter(TabunganScene.buildPage());
@@ -67,7 +67,7 @@ public class Sidebar {
         logoutButton.setOnAction(e -> {
             Alert confirmLogout = new Alert(Alert.AlertType.CONFIRMATION);
 
-            confirmLogout.setTitle("Logout");
+            confirmLogout.setTitle("Log Out");
             confirmLogout.setHeaderText("Apakah kamu yakin ingin keluar?");
             confirmLogout.setContentText("Kamu akan keluar dari akun ini.");
             confirmLogout.getDialogPane().setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
