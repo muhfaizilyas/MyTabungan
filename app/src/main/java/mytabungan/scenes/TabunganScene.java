@@ -238,6 +238,7 @@ public class TabunganScene {
                 }
 
                 boolean updateSaving = savingDAO.updateSavingAmount(tabungan.getId(), nominal);
+                wishlistDAO.allocateDepositToWishlists(userId, nominal);
                 boolean saveDeposit = depositDAO.addDeposit(new Deposit( 0, userId,
                     "MAIN_SAVING", tabungan.getId(), nominal, null));
                     

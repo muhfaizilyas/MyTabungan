@@ -197,28 +197,25 @@
             return 0;
         }
 
-        public void distributeMonthlySaving(int userId, double monthlySaving) {
+        public void allocateDepositToWishlists(int userId, double depositAmount) {
             String sql = "SELECT id, max_limit FROM wishlists WHERE user_id = ? AND status = 'ONGOING'";
-
-            try (Connection conn = DatabaseConfig.connect();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
+            try ( Connection conn = DatabaseConfig.connect();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, userId);
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
                     int wishlistId = rs.getInt("id");
-                    double maxLimit = rs.getDouble("max_limit");
+                    double limit = rs.getDouble("max_limit");
+                    double amount = depositAmount * limit / 100;
 
-                    double allocation = monthlySaving * (maxLimit / 100.0);
-
-                    addToWishlist(wishlistId, allocation); // 🔥 INI UPDATE DB REAL
+                    addToWishlist( wishlistId, amount );
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         //  Helper: mapping ResultSet  Wishlist
         private Wishlist mapRow(ResultSet rs) throws Exception {
             return new Wishlist(

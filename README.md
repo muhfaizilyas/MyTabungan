@@ -1,13 +1,15 @@
 # Tabungin
-Proyek Akhir Lab PBO 2026 - Kelompok 24
+**Proyek Akhir Lab PBO 2026 - Kelompok 24**
 
 ## Setup Database (Local MySQL)
 Project ini menggunakan MySQL lokal untuk menyimpan ....
+
 ### Lokasi File
 Untuk pengaturan koneksi database ada pada:
-_utils/database.py
+_database/DatabaseConfig.java
+
 Sedangkan, semua pengaturan tabel database (init) ada pada:
-_utils/database.py
+_database/DBIniatializer.java
 
 ### Konfigurasi awal
 Sebelum menjalankan program:
@@ -17,10 +19,20 @@ Sebelum menjalankan program:
 _*blbalababa
 #### Buat Database
 1.
-#### Buat Tabel ...
+
+#### Buat Tabel Users
 1.
 2.
-3. dst
+
+#### Buat Tabel dan sterusnya
+1.
+2.
+
+#### Catatan
+- Ubah isi atau struktur tabel jika diperlukan, misalnya menambahkan dan menghapus kolom baru, mengubah tipe data, atau menyesuaikan relasi sesuai kebutuhan fiturnya.
+- Jalankan satu per satu agar mudah mendeteksi error.
+- Setelah tabel berhasil dibuat, biarkan semua dalam kondisi dikomentari agar tidak duplikat saat file di-run ulang.
+- Kalau ada error seperti "database doesn't exist", pastikan database nya sudah dibuat di langkah pertama.
 
 ## Cara Menjalankan Program Aplikasi
 Jalankan di terminal:
@@ -31,20 +43,16 @@ blbalalal
 
 ## Struktur Folder
 Proyek ini menggunakan ....
-- dao
-- database
-- models
-- scenes
-- utils
+- dao :
+- database :
+- models :
+- scenes :
+- utils :
 blablabla
 
 ## Struktur Kode
-#### Catatan
-- Ubah isi atau struktur tabel jika diperlukan, misalnya menambahkan dan menghapus kolom baru, mengubah tipe data, atau menyesuaikan relasi sesuai kebutuhan fiturnya.
-- Jalankan satu per satu agar mudah mendeteksi error.
-- Setelah tabel berhasil dibuat, biarkan semua dalam kondisi dikomentari agar tidak duplikat saat file di-run ulang.
-- Kalau ada error seperti "database doesn't exist", pastikan database nya sudah dibuat di langkah pertama.
+blabalalala
 
 ## Penerapan Pilar OOP (Object Oriented Programming)
-blavababa
-_*
+**blavababa**
+_*yaa
