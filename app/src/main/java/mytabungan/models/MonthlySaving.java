@@ -39,7 +39,8 @@ public class MonthlySaving extends Saving {
         );
     }
 
-    // Persentase (opsional)
+    // Persentase
+    @Override
     public double getProgressPercentage() {
         if (targetAmount == 0) {
             return 0;
@@ -47,6 +48,10 @@ public class MonthlySaving extends Saving {
         return Math.min( 100,
             (savedAmount / targetAmount) * 100
         );
+    }
+
+    public double getRemainingAllocationPercentage(double allocatedPercentage) {
+        return Math.max(0, 100 - allocatedPercentage);
     }
 }
 

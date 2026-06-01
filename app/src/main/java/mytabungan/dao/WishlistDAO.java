@@ -12,13 +12,13 @@ import mytabungan.models.Wishlist;
 
 public class WishlistDAO {
 
-    //  Ambil semua wishlist milik user (status ONGOING) 
+    //  Ambil semua wishlist milik user (status ONGOING)
     public List<Wishlist> getWishlistsByUserId(int userId) {
         String sql = "SELECT * FROM wishlists WHERE user_id = ? AND status = 'ONGOING' ORDER BY created_at ASC";
         List<Wishlist> list = new ArrayList<>();
 
         try (Connection conn = DatabaseConfig.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
@@ -32,12 +32,12 @@ public class WishlistDAO {
         return list;
     }
 
-    //  Ambil satu wishlist terbaru (dipakai TabunganScene) 
+    //  Ambil satu wishlist terbaru (dipakai TabunganScene)
     public Wishlist getWishlistByUserId(int userId) {
         String sql = "SELECT * FROM wishlists WHERE user_id = ? AND status = 'ONGOING' ORDER BY created_at DESC LIMIT 1";
 
         try (Connection conn = DatabaseConfig.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
@@ -51,13 +51,13 @@ public class WishlistDAO {
         return null;
     }
 
-    //  Buat wishlist baru, kembalikan id yang di-generate 
+    //  Buat wishlist baru, kembalikan id yang di-generate
     public int createWishlist(Wishlist wishlist) {
         String sql = "INSERT INTO wishlists (user_id, title, target_price, saved_amount, max_limit, status, period) "
-                   + "VALUES (?, ?, ?, 0, ?, 'ONGOING', ?)";
+                + "VALUES (?, ?, ?, 0, ?, 'ONGOING', ?)";
 
         try (Connection conn = DatabaseConfig.connect();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, wishlist.getUserId());
             ps.setString(2, wishlist.getTitle());
@@ -78,12 +78,12 @@ public class WishlistDAO {
         return -1;
     }
 
-    //  Tambah uang ke saved_amount wishlist tertentu 
+    //  Tambah uang ke saved_amount wishlist tertentu
     public boolean addToWishlist(int wishlistId, double amount) {
         String sql = "UPDATE wishlists SET saved_amount = saved_amount + ? WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setDouble(1, amount);
             ps.setInt(2, wishlistId);
@@ -99,7 +99,7 @@ public class WishlistDAO {
         return false;
     }
 
-    //  Cek setelah deposit: kalau sudah tercapai, ubah status jadi REACHED 
+    //  Cek setelah deposit: kalau sudah tercapai, ubah status jadi REACHED
     private void checkAndMarkReached(Connection conn, int wishlistId) {
         String checkSql = "SELECT saved_amount, target_price FROM wishlists WHERE id = ?";
 
@@ -124,12 +124,12 @@ public class WishlistDAO {
         }
     }
 
-    //  Hapus / batalkan wishlist 
+    //  Hapus / batalkan wishlist
     public boolean deleteWishlist(int wishlistId) {
         String sql = "UPDATE wishlists SET status = 'CANCELLED' WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, wishlistId);
             return ps.executeUpdate() > 0;
@@ -139,12 +139,12 @@ public class WishlistDAO {
         return false;
     }
 
-    //  Hitung total persen alokasi dari semua wishlist ONGOING milik user 
+    //  Hitung total persen alokasi dari semua wishlist ONGOING milik user
     public double getTotalMaxLimitByUserId(int userId) {
         String sql = "SELECT SUM(max_limit) FROM wishlists WHERE user_id = ? AND status = 'ONGOING'";
 
         try (Connection conn = DatabaseConfig.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
@@ -158,7 +158,7 @@ public class WishlistDAO {
         return 0;
     }
 
-    //  Helper: mapping ResultSet  Wishlist 
+    //  Helper: mapping ResultSet  Wishlist
     private Wishlist mapRow(ResultSet rs) throws Exception {
         return new Wishlist(
             rs.getInt("id"),

@@ -1,34 +1,18 @@
 package mytabungan.scenes;
 
 import java.text.NumberFormat;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
-import mytabungan.dao.DepositDAO;
-import mytabungan.dao.SavingDAO;
-import mytabungan.dao.WishlistDAO;
-import mytabungan.models.Deposit;
-import mytabungan.models.MonthlySaving;
-import mytabungan.models.Wishlist;
+import mytabungan.dao.*;
+import mytabungan.models.*;
 import mytabungan.utils.SessionManager;
 
 public class TabunganScene {
@@ -44,7 +28,7 @@ public class TabunganScene {
         // Data dari DAO
         SavingDAO savingDAO = new SavingDAO();
         DepositDAO depositDAO = new DepositDAO();
-        Wishlist wishlist = new WishlistDAO().getWishlistByUserId(userId);
+        // Wishlist wishlist = new WishlistDAO().getWishlistByUserId(userId);
         MonthlySaving tabunganData = savingDAO.getSavingByUserId(userId);
         
         // Halaman saat tabungan belum ada di DB
@@ -78,6 +62,8 @@ public class TabunganScene {
         }
 
         // String wishlistAktif = "—";
+        WishlistDAO wishlistDAO = new WishlistDAO();
+        List<Wishlist> wishlists = wishlistDAO.getWishlistsByUserId(userId);
         List<Deposit> deposits = new DepositDAO().getDepositsByUserId(userId);
 
         // === Root Page ===
@@ -141,7 +127,8 @@ public class TabunganScene {
         HBox progLabelRow = new HBox(terkumpulLabel, spacerP, pctLabel);
         ProgressBar progressBar = new ProgressBar(pct);
         progressBar.setMaxWidth(Double.MAX_VALUE);
-        progressBar.setPrefHeight(10);
+        progressBar.setPrefHeight(20);
+        progressBar.setMinHeight(15);
 
         // Status
         Label statusLabel = new Label();
@@ -188,6 +175,12 @@ public class TabunganScene {
                     return;
                 }
 
+                double sisa = tabungan.getTargetAmount() - tabungan.getSavedAmount();
+                if (nominal > sisa) {
+                    msgLabel.setText("Maksimal setor Rp" + formatRupiah(sisa));
+                    return;
+                }
+
                 boolean updateSaving = savingDAO.updateSavingAmount(tabungan.getId(), nominal);
                 boolean saveDeposit = depositDAO.addDeposit(new Deposit( 0, userId,
                     "MAIN_SAVING", tabungan.getId(), nominal, null));
@@ -207,37 +200,30 @@ public class TabunganScene {
         HBox setorInputRow = new HBox(8, nominalField, tambahBtn);
 
         // Wishlist info
-        String wishlistAktif = wishlist != null ? wishlist.getTitle() : "Tidak ditemukan";
-        Label wishlistAktifTitle = new Label("Wishlist Aktif");
-        Label wishlistNamaLabel = new Label(wishlistAktif);
-        wishlistNamaLabel.setStyle("-fx-font-weight: bold;");
+        Label wishlistTitle = new Label("Wishlist Aktif");
+        wishlistTitle.setStyle("-fx-font-weight: bold;");
+        VBox wishlistList = new VBox(8);
 
-        double alokasi = wishlist != null ? wishlist.getMaxLimit() : 0;
-        Label alokasiTitle = new Label("Alokasi Wishlist");
-        Label alokasiPctLabel = new Label((int) alokasi + "%");
-        alokasiPctLabel.setStyle("-fx-font-weight: bold;");
+        if (wishlists.isEmpty()) {
+            wishlistList.getChildren().add(new Label("Belum ada wishlist."));
+        } else {
+            for (Wishlist w : wishlists) {
+                double estimasi = w.calculateMonthlyLimit(tabungan);
+                Label namaLabel = new Label(w.getTitle());
+                namaLabel.setStyle("-fx-font-weight: bold;");
+                Label alokasiLabel = new Label("Alokasi: " + (int) w.getMaxLimit() + "%");
+                Label estimasiLabel = new Label("Estimasi bulan ini: " + formatRupiah(estimasi));
 
-        HBox wishlistTopRow = new HBox(12,
-            new HBox(wishlistAktifTitle),
-            new HBox(alokasiTitle)
-        );
-        HBox wishlistTagRow = new HBox(12,
-            makeTagBox(wishlistNamaLabel),
-            makeTagBox(alokasiPctLabel)
-        );
-
-        double alokasiAmt = 0;
-        if (tabungan != null && wishlist != null) {
-            alokasiAmt = wishlist.calculateMonthlyLimit(tabungan);
+                VBox card = new VBox( 2, namaLabel, alokasiLabel, estimasiLabel);
+                card.setPadding(new Insets(6));
+                wishlistList.getChildren().add(card);
+            }
         }
+        ScrollPane wishlistScroll = new ScrollPane(wishlistList);
+        wishlistScroll.setFitToWidth(true);
+        wishlistScroll.setPrefHeight(180);
 
-        Label estimasiTitle = new Label("Estimasi bulan ini");
-        Label estimasiAmt = new Label(formatRupiah(alokasiAmt));
-        estimasiAmt.setStyle("-fx-font-weight: bold;");
-
-        VBox wishlistCard = new VBox(6, wishlistTopRow, wishlistTagRow,
-            estimasiTitle, estimasiAmt
-        );
+        VBox wishlistCard = new VBox(8, wishlistTitle, wishlistScroll);
 
         // Left Side
         VBox leftBottom = new VBox(12, setorLabel, setorInputRow, msgLabel, wishlistCard);

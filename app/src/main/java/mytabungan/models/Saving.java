@@ -43,4 +43,5 @@ public abstract class Saving {
     public abstract boolean isReached();
 
     abstract double getRemaining();
+    abstract double getProgressPercentage();
 }
