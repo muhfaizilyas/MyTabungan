@@ -8,7 +8,8 @@
     import java.util.List;
 
     import mytabungan.database.DatabaseConfig;
-    import mytabungan.models.Wishlist;
+import mytabungan.models.MonthlySaving;
+import mytabungan.models.Wishlist;
 
     public class WishlistDAO {
 
@@ -197,28 +198,49 @@
             return 0;
         }
 
-        public void distributeMonthlySaving(int userId, double monthlySaving) {
+        public void allocateDepositToWishlists(int userId, double depositAmount) {
             String sql = "SELECT id, max_limit FROM wishlists WHERE user_id = ? AND status = 'ONGOING'";
-
-            try (Connection conn = DatabaseConfig.connect();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
+            try ( Connection conn = DatabaseConfig.connect();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, userId);
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
                     int wishlistId = rs.getInt("id");
-                    double maxLimit = rs.getDouble("max_limit");
+                    double limit = rs.getDouble("max_limit");
+                    double amount = depositAmount * limit / 100;
 
-                    double allocation = monthlySaving * (maxLimit / 100.0);
-
-                    addToWishlist(wishlistId, allocation); // 🔥 INI UPDATE DB REAL
+                    addToWishlist( wishlistId, amount );
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        public void syncWishlistAllocation(int userId) {
+            SavingDAO savingDAO = new SavingDAO();
+            MonthlySaving saving = savingDAO.getSavingByUserId(userId);
+            
+            if (saving == null) return;
+
+            double totalTabungan = saving.getSavedAmount();
+            String sql = "UPDATE wishlists SET saved_amount = ? WHERE id = ?";
+            try (Connection conn = DatabaseConfig.connect();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                List<Wishlist> wishlists = getWishlistsByUserId(userId);
+                for (Wishlist w : wishlists) {
+                    double nominalBaru = totalTabungan * w.getMaxLimit() / 100.0;
+                    ps.setDouble(1, nominalBaru);
+                    ps.setInt(2, w.getId());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         //  Helper: mapping ResultSet  Wishlist
         private Wishlist mapRow(ResultSet rs) throws Exception {
             return new Wishlist(

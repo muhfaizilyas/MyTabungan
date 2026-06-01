@@ -243,6 +243,7 @@ public class TabunganScene {
                     
                 if (updateSaving && saveDeposit) {
                     msgLabel.setText("Berhasil menabung!");
+                    wishlistDAO.allocateDepositToWishlists(userId, nominal);
                     nominalField.clear();
                     MainScene.refresh();
                 } else {

@@ -108,7 +108,7 @@ public class WishlistScene {
         Button distribusiBtn = new Button("Distribusi Tabungan");
         distribusiBtn.setOnAction(e -> {
             if (tabungan != null) {
-                wishlistDAO.distributeMonthlySaving(userId, tabungan.getSavedAmount());
+                // wishlistDAO.distributeMonthlySaving(userId, tabungan.getSavedAmount());
                 MainScene.refresh();
             }
         });
