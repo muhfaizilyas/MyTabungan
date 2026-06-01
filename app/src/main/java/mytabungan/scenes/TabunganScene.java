@@ -125,8 +125,11 @@ public class TabunganScene {
         // Target Bulanan + button "Ubah Target"
         double target = tabungan.getTargetAmount();
         double terkumpul = tabungan.getSavedAmount();
-        double pct = tabungan.getProgressPercentage() / 100;
-        int pctInt = (int) Math.round(pct * 100);
+        // double pct = tabungan.getProgressPercentage() / 100;
+        // int pctInt = (int) Math.round(pct * 100);
+
+        double rasioMurni = (target > 0) ? (terkumpul / target) : 0.0;
+        int pctInt = (int) Math.round(rasioMurni * 100);
 
         Label targetLabel  = new Label("Target Bulanan");
         targetLabel.setStyle("-fx-text-fill: " + WHITE_70 + "; -fx-font-size: 12px;");
@@ -150,18 +153,24 @@ public class TabunganScene {
         HBox barBg = new HBox();
         barBg.setMaxWidth(Double.MAX_VALUE);
         barBg.setPrefHeight(12);
-        barBg.setStyle("-fx-background-color: " + NAVY_SURFACE + "; -fx-background-radius: 8;");
-
+        barBg.setStyle("-fx-background-color: " + WHITE_40+ "; -fx-background-radius: 8;");
+        
         HBox barFill = new HBox();
         barFill.setPrefHeight(12);
+        barFill.setPrefWidth(0);
+        barFill.setMaxWidth(Region.USE_PREF_SIZE);
         barFill.setStyle("-fx-background-color: " + FIRST_OF_SPRING + "; -fx-background-radius: 8;");
-        barBg.widthProperty().addListener((obs, oldW, newW) ->
-            barFill.setPrefWidth(newW.doubleValue() * Math.min(1.0, pct))
-        );
-
-        StackPane progressBarPane = new StackPane(barBg, barFill);
-        progressBarPane.setMinHeight(12);
+        barBg.widthProperty().addListener((obs, oldW, newW) ->{
+            double lebarBarHijau = newW.doubleValue() * Math.min(1.0, rasioMurni);
+            barFill.setPrefWidth(lebarBarHijau);
+        }
+    );
+    
+    StackPane progressBarPane = new StackPane(barBg, barFill);
+    progressBarPane.setMinHeight(12);
+    progressBarPane.setPrefHeight(12);
         StackPane.setAlignment(barFill, Pos.CENTER_LEFT);
+        // barFill.setManaged(false);
         HBox.setHgrow(progressBarPane, Priority.ALWAYS);
 
         Label pctLabel = new Label("Sudah terkumpul " + pctInt + "%");
@@ -251,32 +260,60 @@ public class TabunganScene {
 
         // Wishlist info
         Label wishlistTitle = new Label("Wishlist Aktif");
-        wishlistTitle.setStyle("-fx-font-weight: bold;");
+        wishlistTitle.setStyle(
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: " + WHITE + ";"
+        );
         VBox wishlistList = new VBox(8);
 
-        if (wishlists.isEmpty()) {
-            wishlistList.getChildren().add(new Label("Belum ada wishlist."));
-        } else {
-            for (Wishlist w : wishlists) {
-                double estimasi = w.calculateMonthlyLimit(tabungan);
-                Label namaLabel = new Label(w.getTitle());
-                namaLabel.setStyle("-fx-font-weight: bold;");
-                Label alokasiLabel = new Label("Alokasi: " + (int) w.getMaxLimit() + "%");
-                Label estimasiLabel = new Label("Estimasi bulan ini: " + formatRupiah(estimasi));
+        // VBox wishlistCard;
+        if (wishlists.isEmpty()){
+            wishlistList.getChildren().add(
+                buildWishlistCard(
+            "Tidak ditemukan",
+            0,
+            0
+        )
+    );
+        }else {
+            for (Wishlist w : wishlists){
 
-                VBox card = new VBox( 2, namaLabel, alokasiLabel, estimasiLabel);
-                card.setPadding(new Insets(6));
+                VBox card = buildWishlistCard(
+                    w.getTitle(),
+                    w.getMaxLimit(),
+                    w.calculateMonthlyLimit(tabungan)
+                );
                 wishlistList.getChildren().add(card);
             }
         }
+        
+        
+       
         ScrollPane wishlistScroll = new ScrollPane(wishlistList);
         wishlistScroll.setFitToWidth(true);
-        wishlistScroll.setPrefHeight(180);
+        wishlistScroll.setPrefHeight(150);
+
+        wishlistScroll.setStyle(
+            "-fx-background: transparent;" +
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+
+        wishlistList.setPadding(new Insets(12));
+        wishlistList.setStyle(
+            "-fx-background-color: " + NAVY_CARD + ";" +
+            "-fx-background-radius: 12;"
+        );
+        // wishlistScroll.setFitToWidth(true);
+        // wishlistScroll.setPrefHeight(150);
+        
+        
 
         VBox wishlistCard = new VBox(8, wishlistTitle, wishlistScroll);
+        wishlistCard.setFillWidth(true);
 
         // Left Side
-        VBox leftBottom = new VBox(12, setorLabel, setorInputRow, msgLabel, wishlistCard);
+        VBox leftBottom = new VBox(8, setorLabel, setorInputRow, msgLabel, wishlistCard);
         leftBottom.setPrefWidth(330);
         leftBottom.setStyle(
             "-fx-background-color: " + NAVY_SURFACE + ";" +
@@ -347,39 +384,40 @@ public class TabunganScene {
     }
 
     private static VBox buildWishlistCard(String wishlistAktif, double alokasi, double alokasiAmt) {
-        Label wishLabel = new Label("Wishlist Aktif");
-        wishLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
-        Label wishName = new Label(wishlistAktif);
-        wishName.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
-        VBox wishLeft = new VBox(2, wishLabel, wishName);
- 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
- 
-        Label alokasiLabel = new Label("Alokasi Wishlist");
-        alokasiLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
-        Label alokasiPctLabel = new Label((int) alokasi + "%");
-        alokasiPctLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + FIRST_OF_SPRING + ";");
-        VBox wishRight = new VBox(2, alokasiLabel, alokasiPctLabel);
-        wishRight.setAlignment(Pos.CENTER_RIGHT);
- 
-        HBox topRow = new HBox(wishLeft, spacer, wishRight);
-        topRow.setAlignment(Pos.CENTER_LEFT);
- 
-        Separator sep = new Separator();
-        sep.setStyle("-fx-background-color: " + WHITE_40 + "; -fx-opacity: 0.4;");
- 
-        Label estimasiLabel = new Label("Estimasi bulan ini:");
-        estimasiLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
-        Label estimasiAmt = new Label(formatRupiah(alokasiAmt));
-        estimasiAmt.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
- 
-        VBox card = new VBox(8, topRow, sep, estimasiLabel, estimasiAmt);
-        card.setStyle(
-            "-fx-background-color: " + NAVY_CARD + ";" +
-            "-fx-background-radius: 12; -fx-padding: 12 14;"
-        );
-        return card;
+       Label wishName = new Label(wishlistAktif);
+    wishName.setStyle(
+        "-fx-font-size: 13px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-text-fill: " + WHITE + ";"
+    );
+
+    Label alokasiLabel = new Label(
+        "Alokasi: " + (int) alokasi + "%"
+    );
+    alokasiLabel.setStyle(
+        "-fx-font-size: 12px;" +
+        "-fx-text-fill: " + WHITE_70 + ";"
+    );
+
+    Label estimasiLabel = new Label(
+        "Estimasi: " + formatRupiah(alokasiAmt)
+    );
+    estimasiLabel.setStyle(
+        "-fx-font-size: 12px;" +
+        "-fx-text-fill: " + WHITE + ";"
+    );
+
+    VBox item = new VBox(
+        3,
+        wishName,
+        alokasiLabel,
+        estimasiLabel
+    );
+    item.setPadding(new Insets(0,0,8,0));
+
+    
+
+    return item;
     }
  
     // ── Stat card ─────────────────────────────────────────────────────
