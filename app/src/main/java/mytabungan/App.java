@@ -6,13 +6,13 @@ package mytabungan;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import mytabungan.scenes.LoginScene;
-import mytabungan.database.DBIniatializer;
+// import mytabungan.database.DBIniatializer;
 
 public class App  extends Application{
 
     @Override
     public void start(Stage primaryStage) {
-        DBIniatializer.init(); // Untuk buat tabel di database
+        // DBIniatializer.init(); // Untuk buat tabel di database
 
         LoginScene loginScene = new LoginScene(primaryStage);
         primaryStage.setScene(loginScene.getLogin(primaryStage));
