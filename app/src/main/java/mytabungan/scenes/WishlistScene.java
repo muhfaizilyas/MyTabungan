@@ -16,6 +16,13 @@ import mytabungan.models.*;
 import mytabungan.utils.SessionManager;
 
 public class WishlistScene {
+    private static final String MIDNIGHT_MIRAGE = "#001F3F";
+    private static final String NAVY_CARD       = "#0A2D5A";
+    private static final String NAVY_SURFACE    = "#143D7A";
+    private static final String FIRST_OF_SPRING = "#DBE64C";
+    private static final String WHITE           = "#FFFFFF";
+    private static final String WHITE_70        = "rgba(255,255,255,0.70)";
+    private static final String WHITE_40        = "rgba(255,255,255,0.40)";
     private static final double MAX_TOTAL_ALOKASI = 70.0; // maks 70% total semua wishlist
     private static final NumberFormat RUP = NumberFormat.getInstance(new Locale("id", "ID"));
 
@@ -48,10 +55,29 @@ public class WishlistScene {
         VBox page = new VBox(18);
         page.setPadding(new Insets(28, 32, 28, 32));
         page.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        page.setStyle("-fx-background-color: #0A2D5A;");
+        page.setStyle("-fx-background-color: " + NAVY_CARD);
 
         // === Header ===
-        Circle avatar = new Circle(22);
+        // Circle avatar = new Circle(22);
+        StackPane avatar = new StackPane();
+        avatar.setPrefSize(44, 44);
+
+        avatar.setStyle(
+            "-fx-background-color: " + FIRST_OF_SPRING + ";" +
+            "-fx-background-radius: 50;"
+        );
+
+        Label avatarLbl = new Label(
+            username.substring(0,1).toUpperCase()
+        );
+
+        avatarLbl.setStyle(
+            "-fx-font-size:18px;" +
+            "-fx-font-weight:bold;" +
+            "-fx-text-fill:" + MIDNIGHT_MIRAGE + ";"
+        );
+
+        avatar.getChildren().add(avatarLbl);
         Label helloLabel    = new Label("Hello,");
         Label usernameLabel = new Label(username + "!");
         helloLabel.setStyle("-fx-text-fill: #001F3F;");
@@ -61,15 +87,35 @@ public class WishlistScene {
         HBox profileBox = new HBox(10, avatar, greetingBox);
         profileBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label namaFitur    = new Label("My Wishlist");
+        // Label namaFitur    = new Label("My Wishlist");
+        Label namaFitur = new Label("MyWishlist");
+
+        namaFitur.setStyle(
+            "-fx-background-color:" + FIRST_OF_SPRING + ";" +
+            "-fx-text-fill:" + MIDNIGHT_MIRAGE + ";" +
+            "-fx-font-weight:bold;" +
+            "-fx-padding:8 18;" +
+            "-fx-background-radius:20;"
+        );
         Label tanggalLabel = new Label(periodeStr);
-        tanggalLabel.setStyle("-fx-font-size: 12px;");
+        tanggalLabel.setStyle(
+            "-fx-font-size: 12px;"+
+            "-fx-text-fill:" + FIRST_OF_SPRING + ";" 
+        );
         VBox fiturBox = new VBox(2, namaFitur, tanggalLabel);
         fiturBox.setAlignment(Pos.CENTER_RIGHT);
 
+        Button distribusiBtn = new Button("Distribusi Tabungan");
+        distribusiBtn.setOnAction(e -> {
+            if (tabungan != null) {
+                // wishlistDAO.distributeMonthlySaving(userId, tabungan.getSavedAmount());
+                MainScene.refresh();
+            }
+        });
+
         Region spacerH = new Region();
         HBox.setHgrow(spacerH, Priority.ALWAYS);
-        HBox headerBox = new HBox(10, profileBox, spacerH, fiturBox);
+        HBox headerBox = new HBox(10, profileBox, spacerH, distribusiBtn, fiturBox);
         headerBox.setAlignment(Pos.CENTER_LEFT);
 
         // === Metric Card ===
@@ -98,7 +144,22 @@ public class WishlistScene {
             namaWishlistTercapaiBulanIni
         );
 
-        HBox metricRow = new HBox(12, cardTotal, cardAlokasi, cardTercapai);
+        VBox cardTambah = makeMetricCard(
+            "+",
+            "Tambah\nWishlist",
+            ""
+        );
+
+        cardTambah.setOnMouseClicked(e ->
+            showTambahWishlistDialog(
+                userId,
+                sisaKapasitasPct,
+                wishlistDAO,
+                savingDAO
+            )
+        );
+
+        HBox metricRow = new HBox(12, cardTambah,  cardTotal, cardAlokasi, cardTercapai);
         HBox.setHgrow(cardTotal,   Priority.ALWAYS);
         HBox.setHgrow(cardAlokasi, Priority.ALWAYS);
         HBox.setHgrow(cardTercapai, Priority.ALWAYS);
@@ -115,16 +176,16 @@ public class WishlistScene {
             : "-fx-font-size: 12px; -fx-text-fill: #555;");
 
         // Tombol Tambah Wishlist
-        Button tambahBtn = new Button("+ Tambah Wishlist");
-        tambahBtn.setDisable(sisaKapasitasPct <= 0); // disable kalau sudah maksimalnya
-        tambahBtn.setOnAction(e ->
-            showTambahWishlistDialog(userId, sisaKapasitasPct, terkumpul, wishlistDAO));
+        // Button tambahBtn = new Button("+ Tambah Wishlist");
+        // tambahBtn.setDisable(sisaKapasitasPct <= 0); // disable kalau sudah maksimalnya
+        // tambahBtn.setOnAction(e ->
+        //     showTambahWishlistDialog(userId, sisaKapasitasPct, wishlistDAO, savingDAO));
 
-        HBox wishlistHeader = new HBox(8, wishlistAktifLabel);
-        Region spacerWH = new Region();
-        HBox.setHgrow(spacerWH, Priority.ALWAYS);
-        wishlistHeader.getChildren().addAll(spacerWH, tambahBtn);
-        wishlistHeader.setAlignment(Pos.CENTER_LEFT);
+        // HBox wishlistHeader = new HBox(8, wishlistAktifLabel);
+        // Region spacerWH = new Region();
+        // HBox.setHgrow(spacerWH, Priority.ALWAYS);
+        // wishlistHeader.getChildren().addAll(spacerWH, tambahBtn);
+        // wishlistHeader.setAlignment(Pos.CENTER_LEFT);
 
         VBox wishlistAktifList = new VBox(8);
         if (wishlistsAktif.isEmpty()) {
@@ -137,8 +198,13 @@ public class WishlistScene {
             }
         }
 
-        VBox leftSection = new VBox(8, wishlistHeader, sisaLabel, wishlistAktifList);
+        VBox leftSection = new VBox(8,sisaLabel, wishlistAktifList);
         leftSection.setPrefWidth(370);
+        leftSection.setStyle(
+            "-fx-background-color:#34529B;" +
+            "-fx-background-radius:20;" +
+            "-fx-padding:20;"
+        );
 
         // === Riwayat Tercapai (kanan) ===
         Label riwayatLabel = new Label("Riwayat Tercapai");
@@ -155,6 +221,11 @@ public class WishlistScene {
 
         VBox rightSection = new VBox(8, riwayatLabel, riwayatList);
         HBox.setHgrow(rightSection, Priority.ALWAYS);
+        rightSection.setStyle(
+            "-fx-background-color:#34529B;" +
+            "-fx-background-radius:20;" +
+            "-fx-padding:20;"
+        );
 
         HBox mainRow = new HBox(16, leftSection, rightSection);
 
@@ -198,6 +269,11 @@ public class WishlistScene {
         }
 
         VBox distribusiSection = new VBox(8, distribusiLabel, distribusiList);
+        distribusiSection.setStyle(
+            "-fx-background-color:#34529B;" +
+            "-fx-background-radius:20;" +
+            "-fx-padding:20;"
+        );
 
         page.getChildren().addAll(
             headerBox,
@@ -252,6 +328,9 @@ public class WishlistScene {
         ProgressBar bar = new ProgressBar(pct);
         bar.setMaxWidth(Double.MAX_VALUE);
         bar.setPrefHeight(8);
+        bar.setStyle(
+            "-fx-accent:" + FIRST_OF_SPRING + ";"
+        );
 
         Label savedLabel  = new Label("Terkumpul " + formatRupiah(w.getSavedAmount()));
         savedLabel.setStyle("-fx-font-size: 11px;");
@@ -275,6 +354,11 @@ public class WishlistScene {
 
         VBox card = new VBox(5, namaRow, statusLabel, bar, progRow, btnRow);
         card.setPadding(new Insets(8));
+        card.setStyle(
+            "-fx-background-color:#3C57A3;" +
+            "-fx-background-radius:18;" +
+            "-fx-padding:12;"
+        );
         return card;
     }
 
@@ -303,23 +387,28 @@ public class WishlistScene {
 
         VBox card = new VBox(5, namaRow, bar, amtLabel);
         card.setPadding(new Insets(8));
+        card.setStyle(
+            "-fx-background-color:#3C57A3;" +
+            "-fx-background-radius:18;" +
+            "-fx-padding:12;"
+        );
         return card;
     }
 
     // Dialog: Tambah Wishlist
     private static void showTambahWishlistDialog(int userId, double sisaKapasitasPct,
-        double terkumpul, WishlistDAO wishlistDAO) {
+            WishlistDAO wishlistDAO, SavingDAO savingDAO) {
 
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Tambah Wishlist");
         dialog.setHeaderText("Sisa kapasitas alokasi: " + (int) sisaKapasitasPct + "%");
 
         TextField namaField    = new TextField();
-        namaField.setPromptText("Nama wishlist");
+        namaField.setPromptText("Nama wishlist (contoh: HP baru)");
         TextField targetField  = new TextField();
         targetField.setPromptText("Target harga (Rp)");
         TextField alokasiField = new TextField();
-        alokasiField.setPromptText("Alokasi dari tabungan (%)");
+        alokasiField.setPromptText("Alokasi dari tabungan (%) — maks " + (int) sisaKapasitasPct + "%");
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
@@ -370,10 +459,6 @@ public class WishlistScene {
 
                 int newId = wishlistDAO.createWishlist(newWishlist);
                 if (newId > 0) {
-                    if (terkumpul > 0) {
-                        double retroAmount = terkumpul * alokasi / 100;
-                        wishlistDAO.addToWishlist(newId, retroAmount);
-                    }
                     dialog.close();
                     MainScene.refresh();
                 } else {
@@ -424,7 +509,6 @@ public class WishlistScene {
                 }
                 boolean ok = wishlistDAO.updateMaxLimit(w.getId(), newAlokasi);
                 if (ok) {
-                    wishlistDAO.syncWishlistAllocation(userId);
                     dialog.close();
                     MainScene.refresh();
                 } else {
@@ -446,7 +530,7 @@ public class WishlistScene {
         confirm.setHeaderText("Hapus \"" + w.getTitle() + "\"?");
         confirm.setContentText(
             "Wishlist ini akan dihapus dan alokasi " + (int) w.getMaxLimit() +
-            "% akan dibebaskan kembali.");
+            "% akan dibebaskan kembali.\nAksi ini tidak dapat dibatalkan.");
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -459,13 +543,26 @@ public class WishlistScene {
     // metric card 3 baris
     private static VBox makeMetricCard(String title, String value, String sub) {
         Label titleLbl = new Label(title);
-        titleLbl.setStyle("-fx-font-size: 12px;");
+        titleLbl.setStyle(
+            "-fx-font-size: 14px;" +
+            "-fx-text-fill:" + WHITE + ";"
+        );
         Label valueLbl = new Label(value);
-        valueLbl.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        valueLbl.setStyle(
+            "-fx-font-size: 20px;" +
+            "-fx-font-weight: bold;" +
+            "fx-text-fill:" + WHITE + ";"
+             );
         Label subLbl = new Label(sub);
-        subLbl.setStyle("-fx-font-size: 12px;");
-        VBox card = new VBox(4, titleLbl, valueLbl, subLbl);
-        card.setPadding(new Insets(12));
+        subLbl.setStyle("-fx-font-size: 12px;" + "-fx-text-fill:" + WHITE_70 + ";");
+        VBox card = new VBox(10, titleLbl, valueLbl, subLbl);
+        card.setPadding(new Insets(18));
+        card.setStyle(
+            "-fx-background-color:#34529B;" +
+            "-fx-background-radius:24;"
+        );  
+         card.setPrefHeight(130);
+         HBox.setHgrow(card, Priority.ALWAYS);
         return card;
     }
 }
