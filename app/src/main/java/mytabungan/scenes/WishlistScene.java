@@ -118,7 +118,7 @@ public class WishlistScene {
         Button tambahBtn = new Button("+ Tambah Wishlist");
         tambahBtn.setDisable(sisaKapasitasPct <= 0); // disable kalau sudah maksimalnya
         tambahBtn.setOnAction(e ->
-            showTambahWishlistDialog(userId, sisaKapasitasPct, wishlistDAO, savingDAO));
+            showTambahWishlistDialog(userId, sisaKapasitasPct, terkumpul, wishlistDAO));
 
         HBox wishlistHeader = new HBox(8, wishlistAktifLabel);
         Region spacerWH = new Region();
@@ -308,7 +308,7 @@ public class WishlistScene {
 
     // Dialog: Tambah Wishlist
     private static void showTambahWishlistDialog(int userId, double sisaKapasitasPct,
-            WishlistDAO wishlistDAO, SavingDAO savingDAO) {
+        double terkumpul, WishlistDAO wishlistDAO) {
 
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Tambah Wishlist");
@@ -370,6 +370,10 @@ public class WishlistScene {
 
                 int newId = wishlistDAO.createWishlist(newWishlist);
                 if (newId > 0) {
+                    if (terkumpul > 0) {
+                        double retroAmount = terkumpul * alokasi / 100;
+                        wishlistDAO.addToWishlist(newId, retroAmount);
+                    }
                     dialog.close();
                     MainScene.refresh();
                 } else {
@@ -420,6 +424,7 @@ public class WishlistScene {
                 }
                 boolean ok = wishlistDAO.updateMaxLimit(w.getId(), newAlokasi);
                 if (ok) {
+                    wishlistDAO.syncWishlistAllocation(userId);
                     dialog.close();
                     MainScene.refresh();
                 } else {
@@ -441,7 +446,7 @@ public class WishlistScene {
         confirm.setHeaderText("Hapus \"" + w.getTitle() + "\"?");
         confirm.setContentText(
             "Wishlist ini akan dihapus dan alokasi " + (int) w.getMaxLimit() +
-            "% akan dibebaskan kembali.\nAksi ini tidak dapat dibatalkan.");
+            "% akan dibebaskan kembali.");
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {

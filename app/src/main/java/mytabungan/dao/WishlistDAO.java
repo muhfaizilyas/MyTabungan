@@ -8,7 +8,8 @@
     import java.util.List;
 
     import mytabungan.database.DatabaseConfig;
-    import mytabungan.models.Wishlist;
+import mytabungan.models.MonthlySaving;
+import mytabungan.models.Wishlist;
 
     public class WishlistDAO {
 
@@ -211,6 +212,30 @@
 
                     addToWishlist( wishlistId, amount );
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void syncWishlistAllocation(int userId) {
+            SavingDAO savingDAO = new SavingDAO();
+            MonthlySaving saving = savingDAO.getSavingByUserId(userId);
+            
+            if (saving == null) return;
+
+            double totalTabungan = saving.getSavedAmount();
+            String sql = "UPDATE wishlists SET saved_amount = ? WHERE id = ?";
+            try (Connection conn = DatabaseConfig.connect();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                List<Wishlist> wishlists = getWishlistsByUserId(userId);
+                for (Wishlist w : wishlists) {
+                    double nominalBaru = totalTabungan * w.getMaxLimit() / 100.0;
+                    ps.setDouble(1, nominalBaru);
+                    ps.setInt(2, w.getId());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
             } catch (Exception e) {
                 e.printStackTrace();
             }
