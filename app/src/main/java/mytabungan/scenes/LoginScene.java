@@ -1,7 +1,8 @@
 package mytabungan.scenes;
-
+ 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,179 +23,201 @@ import mytabungan.models.MonthlySaving;
 import mytabungan.models.User;
 import mytabungan.utils.SessionManager;
 import mytabungan.utils.ValidationUtil;
-
+ 
 public class LoginScene {
     private Stage stage;
     private UserDAO userDAO = new UserDAO();
-
+ 
     public LoginScene(Stage stage) {
         this.stage = stage;
     }
-
+ 
     public static Scene getLogin(Stage stage) {
-
+ 
         // === Left Side ===
         VBox leftSide = AuthLayout.buildPanel();
-
+        leftSide.setPrefWidth(320);
+        leftSide.setMaxWidth(320);
+        leftSide.setMinWidth(320);
+ 
         // === Right Side ===
         VBox rightSide = buildFormPanel(stage);
-
-        // === Root Layout ===
-        HBox root = new HBox(leftSide, rightSide);
-        HBox.setHgrow(leftSide, Priority.ALWAYS);
-        HBox.setHgrow(rightSide, Priority.ALWAYS);
-
+        rightSide.setPrefWidth(320);
+        rightSide.setMaxWidth(320);
+        rightSide.setMinWidth(320);
+ 
+        // === Root: single navy background, centered with padding ===
+        HBox root = new HBox(60, leftSide, rightSide);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #082448;");
+ 
         Scene scene = new Scene(root, 960, 600);
         scene.getStylesheets().add(
             LoginScene.class.getResource("/style.css").toExternalForm()
         );
         return scene;
     }
-    
+ 
     private static VBox buildFormPanel(Stage stage) {
-        VBox rightSide = new VBox(0);
+        // Right side: transparent, centers the card both vertically & horizontally
+        VBox rightSide = new VBox();
         rightSide.setAlignment(Pos.CENTER);
-        rightSide.setPrefWidth(500);
-        rightSide.setMinWidth(500);
-        rightSide.setMaxWidth(Double.MAX_VALUE);
-        rightSide.setStyle("-fx-background-color: #F6F7ED; -fx-padding: 60 70 60 70;");
-
+        rightSide.setStyle("-fx-background-color: transparent;");
+ 
+        // === Card — sized only to its content, NOT stretched ===
+        VBox card = new VBox(0);
+        card.setAlignment(Pos.CENTER);
+        card.setMaxWidth(340);
+        card.setPrefWidth(340);
+        // Do NOT set prefHeight — let content determine height
+        card.setStyle("""
+            -fx-background-color: #001F3F;
+            -fx-background-radius: 22;
+            -fx-padding: 32 36 28 36;
+            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 28, 0, 0, 6);
+        """);
+ 
+        // === Title ===
         Label title = new Label("Login");
-        title.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
-
-        Rectangle Underline = new Rectangle(46, 3);
-        Underline.setFill(Color.web("#001F3F"));
-        Underline.setArcWidth(2);
-        Underline.setArcHeight(2);
-
-        VBox titleBlock = new VBox(8, title, Underline);
+        title.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;");
+ 
+        Rectangle underline = new Rectangle(42, 3);
+        underline.setFill(Color.web("#FFFFFF"));
+        underline.setArcWidth(2);
+        underline.setArcHeight(2);
+ 
+        VBox titleBlock = new VBox(6, title, underline);
         titleBlock.setAlignment(Pos.CENTER);
-        titleBlock.setMaxWidth(260);
-
-        Region gap1 = new Region();
-        gap1.setPrefHeight(58);
-
-        // Username or Email
-        Label userLabel = new Label("Username or Email");
-        userLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; fx-text-fill: #4A4A4A;");
-
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Input Username or Email");
-        usernameField.setMaxWidth(Double.MAX_VALUE);
-        usernameField.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #D0D0C8;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            -fx-padding: 10 12 10 12;
+ 
+        Region gap1 = new Region(); gap1.setPrefHeight(24);
+ 
+        // === Email Field ===
+        TextField emailField = new TextField();
+        emailField.setPromptText("Enter Email or Username...");
+        emailField.setMaxWidth(Double.MAX_VALUE);
+        emailField.setStyle("""
+            -fx-background-color: #C8CBCC;
+            -fx-border-color: transparent;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-padding: 11 16 11 16;
             -fx-font-size: 13px;
             -fx-text-fill: #222;
-            -fx-prompt-text-fill: #AAAAAA;
+            -fx-prompt-text-fill: #555;
         """);
-
-        VBox userBox = new VBox(6, userLabel, usernameField);
-        Region gap2 = new Region();
-        gap2.setPrefHeight(24);
-
-        // Password
-        Label passLabel = new Label("Password");
-        passLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4A4A4A;");
-
+ 
+        Region gap2 = new Region(); gap2.setPrefHeight(14);
+ 
+        // === Password Field ===
         PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Input Password");
+        passwordField.setPromptText("Enter Password...");
         passwordField.setMaxWidth(Double.MAX_VALUE);
         passwordField.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #D0D0C8;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            -fx-padding: 10 12 10 12;
+            -fx-background-color: #C8CBCC;
+            -fx-border-color: transparent;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-padding: 11 16 11 16;
             -fx-font-size: 13px;
             -fx-text-fill: #222;
-            -fx-prompt-text-fill: #AAAAAA;
+            -fx-prompt-text-fill: #555;
         """);
-
-        VBox passBox = new VBox(6, passLabel, passwordField);
-        Region gap3 = new Region();
-        gap3.setPrefHeight(24);
-
-        // Button
-        Button loginBtn = new Button("Login");
+ 
+        Region gap3 = new Region(); gap3.setPrefHeight(48);
+ 
+        // === Login Button ===
+        Button loginBtn = new Button("LOGIN");
         loginBtn.setMaxWidth(Double.MAX_VALUE);
-        loginBtn.getStyleClass().add("buttonLogin");
-
-        // Message
+        String btnStyle = """
+            -fx-background-color: #C8D92A;
+            -fx-text-fill: #1A1A1A;
+            -fx-font-size: 14px;
+            -fx-font-weight: bold;
+            -fx-background-radius: 22;
+            -fx-padding: 12 0 12 0;
+            -fx-cursor: hand;
+        """;
+        String btnHover = """
+            -fx-background-color: #b5c420;
+            -fx-text-fill: #1A1A1A;
+            -fx-font-size: 14px;
+            -fx-font-weight: bold;
+            -fx-background-radius: 22;
+            -fx-padding: 12 0 12 0;
+            -fx-cursor: hand;
+        """;
+        loginBtn.setStyle(btnStyle);
+        loginBtn.setOnMouseEntered(e -> loginBtn.setStyle(btnHover));
+        loginBtn.setOnMouseExited(e -> loginBtn.setStyle(btnStyle));
+ 
+        // === Message Label ===
         Label message = new Label();
         message.setWrapText(true);
-        message.setMaxWidth(300);
-
-        Region gap4 = new Region();
-        gap4.setPrefHeight(6);
-
-        // Register link
+        message.setMaxWidth(280);
+        message.setAlignment(Pos.CENTER);
+ 
+        Region gap4 = new Region(); gap4.setPrefHeight(4);
+ 
+        // === Register Link ===
         Label desc = new Label("Don't have an account? ");
-        desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #555;");
-
+        desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #AAAAAA;");
+ 
         Label registerNow = new Label("Register now");
         registerNow.setStyle("""
             -fx-font-size: 13px;
-            -fx-text-fill: #1E488F;
+            -fx-text-fill: #FFFFFF;
             -fx-underline: true;
             -fx-font-weight: bold;
             -fx-cursor: hand;
         """);
-
-        // HBox registerBox = new HBox(3);
-        // registerBox.setAlignment(Pos.CENTER);
-        // registerBox.getChildren().addAll(desc, registerNow);
+ 
         HBox registerBox = new HBox(3, desc, registerNow);
         registerBox.setAlignment(Pos.CENTER);
-
-        VBox formArea = new VBox();
-        formArea.setMaxWidth(320);
-        formArea.setAlignment(Pos.CENTER);
-        Region gapR = new Region(); gapR.setPrefHeight(42);
-        formArea.getChildren().addAll(
+ 
+        Region gap5 = new Region(); gap5.setPrefHeight(12);
+ 
+        card.getChildren().addAll(
             titleBlock, gap1,
-            userBox, gap2,
-            passBox, gap3,
-            message, gap4,
-            loginBtn, gapR,
+            emailField, gap2,
+            passwordField, gap3,
+            loginBtn,
+            gap4, message, gap5,
             registerBox
         );
-
-        rightSide.getChildren().add(formArea);
-
+ 
+        rightSide.getChildren().add(card);
+ 
+        // === Navigation ===
         registerNow.setOnMouseClicked(e -> {
-            // navigate to RegisterScene
             stage.setScene(RegisterScene.getRegist(stage));
         });
-
+ 
         // === Action Login ===
         loginBtn.setOnAction(e -> {
-            String user = usernameField.getText();
+            String user = emailField.getText();
             String password = passwordField.getText();
-
+ 
             if (ValidationUtil.isEmpty(user) || ValidationUtil.isEmpty(password)) {
                 message.setText("Inputan tidak boleh kosong!");
-                message.setStyle("-fx-text-fill: #CC0000; -fx-font-size: 12px;");
+                message.setStyle("-fx-text-fill: #FF6B6B; -fx-font-size: 11px;");
                 return;
             }
-
+ 
             if (!ValidationUtil.isValidPassword(password)) {
                 message.setText("Password minimal 8 karakter!");
-                message.setStyle("-fx-text-fill: #CC0000; -fx-font-size: 12px;");
+                message.setStyle("-fx-text-fill: #FF6B6B; -fx-font-size: 11px;");
                 return;
             }
+ 
             message.setText("Processing login...");
-            message.setStyle("-fx-text-fill: #888; -fx-font-size: 12px;");
+            message.setStyle("-fx-text-fill: #AAAAAA; -fx-font-size: 11px;");
             User loggedInUser = new UserDAO().login(user, password);
-            
+ 
             if (loggedInUser != null) {
                 SessionManager.login(loggedInUser);
                 message.setText("Login berhasil!");
-                message.setStyle("-fx-text-fill: #74C365; -fx-font-weight: bold; -fx-font-size: 12px;");
-                
+                message.setStyle("-fx-text-fill: #C8D92A; -fx-font-weight: bold; -fx-font-size: 11px;");
+ 
                 MainScene utama = new MainScene();
                 PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
                 delay.setOnFinished(event -> {
@@ -202,7 +225,7 @@ public class LoginScene {
                     Platform.runLater(() -> {
                         SavingDAO savingDAO = new SavingDAO();
                         MonthlySaving saving = savingDAO.getSavingByUserId(loggedInUser.getId());
-                        
+ 
                         if (saving == null) {
                             MonthlySaving created = TabunganScene.showCreateSavingDialog(
                                 loggedInUser.getId(), savingDAO
@@ -216,10 +239,10 @@ public class LoginScene {
                 delay.play();
             } else {
                 message.setText("Username / email atau password salah!");
-                message.setStyle("-fx-text-fill: #CC0000; -fx-font-size: 12px;");
+                message.setStyle("-fx-text-fill: #FF6B6B; -fx-font-size: 11px;");
             }
         });
-
+ 
         return rightSide;
     }
 }
