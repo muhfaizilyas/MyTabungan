@@ -16,6 +16,15 @@ import mytabungan.models.*;
 import mytabungan.utils.SessionManager;
 
 public class TabunganScene {
+    private static final String MIDNIGHT_MIRAGE = "#001F3F";
+    private static final String NAVY_CARD       = "#0A2D5A";
+    private static final String NAVY_SURFACE    = "#0E3570";
+    private static final String FIRST_OF_SPRING = "#DBE64C";
+    private static final String SPRING_DARK     = "#b8c23a";
+    private static final String WHITE           = "#FFFFFF";
+    private static final String WHITE_70        = "rgba(255,255,255,0.70)";
+    private static final String WHITE_40        = "rgba(255,255,255,0.40)";
+
     private static final NumberFormat RUP = NumberFormat.getInstance (new Locale("id", "ID"));
     private static String formatRupiah(double amount) {
         return "Rp" + RUP.format(amount);
@@ -34,20 +43,19 @@ public class TabunganScene {
         // Halaman saat tabungan belum ada di DB
         if (tabunganData == null) {
             Label title = new Label("Belum ada tabungan");
-            title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
+            title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: " + FIRST_OF_SPRING + ";");
             Label desc = new Label("Silakan tentukan target tabungan bulan ini terlebih dahulu.");
-            desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
+            desc.setStyle("-fx-font-size: 13px; -fx-text-fill: " + WHITE_70 + ";");
 
-            VBox box = new VBox(8, title, desc);
+            VBox box = new VBox(12, title, desc);
             box.setAlignment(Pos.CENTER);
-            box.setPadding(new Insets(20));
-            VBox.setMargin(box, new Insets(115, 0, 0, 0));
+            box.setPadding(new Insets(30));
+            box.setStyle("-fx-background-color: " + NAVY_CARD +  ";-fx-background-radius: 20;");
 
             VBox wrapper = new VBox(box);
             wrapper.setAlignment(Pos.CENTER);
             wrapper.setPrefHeight(600);
-            wrapper.setMinHeight(600);
-            wrapper.setStyle("-fx-background-color: #F6F7ED;");
+            wrapper.setStyle("-fx-background-color: " + MIDNIGHT_MIRAGE + "; -fx-padding: 40;");
             return wrapper;
         }
         final MonthlySaving tabungan = tabunganData;
@@ -67,47 +75,69 @@ public class TabunganScene {
         List<Deposit> deposits = new DepositDAO().getDepositsByUserId(userId);
 
         // === Root Page ===
-        VBox page = new VBox(20);
-        page.setPrefWidth(750);
-        page.setMinWidth(750);
-        page.setMaxWidth(Double.MAX_VALUE);
-        page.setPadding(new Insets(30));
-        page.setStyle("-fx-background-color: #F6F7ED;");
+        VBox page = new VBox(18);
+        page.setPadding(new Insets(28, 32, 28, 32));
+        page.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        page.setStyle("-fx-backround-color:" + NAVY_CARD + ";");
         
-        // Header: Profil + Teks Hello (kiri)
-        Circle avatar = new Circle(22);
-        Label helloLabel = new Label("Hello, ");
-        Label usernameLabel = new Label(username + "!");
-        helloLabel.setStyle("-fx-text-fill: #001F3F;");
-        usernameLabel.setStyle("-fx-text-fill: #001F3F; -fx-font-weight: bold;");
 
-        VBox greetingBox = new VBox(2, helloLabel, usernameLabel);
-        greetingBox.setAlignment(Pos.CENTER_LEFT);
-        HBox profileBox = new HBox(10, avatar, greetingBox);
+        
+        // Header
+        StackPane avatar = new StackPane();
+        avatar.setPrefSize(44, 44);
+        avatar.setMinSize(44, 44);
+        avatar.setMaxSize(44, 44);
+        avatar.setStyle(
+            "-fx-background-color: " + NAVY_SURFACE + ";" +
+            "-fx-background-radius: 50;"
+        );
+        Label avatarLbl = new Label(username.substring(0, 1).toUpperCase());
+        avatarLbl.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: " + FIRST_OF_SPRING + ";");
+        avatar.getChildren().add(avatarLbl);
+
+        Label helloLabel    = new Label("Halo,");
+        helloLabel.setStyle("-fx-text-fill: " + WHITE_70 + "; -fx-font-size: 12px;");
+        Label usernameLabel = new Label(username + "!");
+        usernameLabel.setStyle("-fx-text-fill: " + WHITE + "; -fx-font-weight: bold; -fx-font-size: 15px;");
+        VBox greetingBox = new VBox(1, helloLabel, usernameLabel);
+        HBox profileBox  = new HBox(12, avatar, greetingBox);
         profileBox.setAlignment(Pos.CENTER_LEFT);
         
         // Header: Nama Fitur + Periode (kanan)
-        Label namafitur = new Label("My Tabungan");
+        Label namafitur = new Label("MyTabungan");
+        namafitur.setStyle(
+            "-fx-background-color: " + FIRST_OF_SPRING + ";" +
+            "-fx-text-fill: " + MIDNIGHT_MIRAGE + "; -fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 6 14 6 14; -fx-background-radius: 20;"
+        );
         Label periodeLabel = new Label("Periode " + periode);
-        periodeLabel.setStyle("-fx-font-size: 12px;");
+        periodeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: "+ WHITE_70 +";");
 
-        VBox fiturBox = new VBox(2, namafitur, periodeLabel);
-        fiturBox.setAlignment(Pos.CENTER_RIGHT);
+        VBox fiturBox = new VBox(3, namafitur, periodeLabel);
+        fiturBox.setAlignment(Pos.CENTER);
 
         Region spacerHeader = new Region();
         HBox.setHgrow(spacerHeader, Priority.ALWAYS);
 
         HBox headerBox = new HBox(profileBox, spacerHeader, fiturBox);
-        headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setAlignment(Pos.CENTER);
 
         // Target Bulanan + button "Ubah Target"
         double target = tabungan.getTargetAmount();
+        double terkumpul = tabungan.getSavedAmount();
+        double pct = tabungan.getProgressPercentage() / 100;
+        int pctInt = (int) Math.round(pct * 100);
+
         Label targetLabel  = new Label("Target Bulanan");
+        targetLabel.setStyle("-fx-text-fill: " + WHITE_70 + "; -fx-font-size: 12px;");
         Label targetAmount = new Label(formatRupiah(target));
-        targetAmount.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
-        VBox targetInfoBox = new VBox(4, targetLabel, targetAmount);
+        targetAmount.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
+        VBox targetInfoBox = new VBox(2, targetLabel, targetAmount);
 
         Button ubahTargetBtn = new Button("Ubah Target");
+        ubahTargetBtn.setStyle(btnLime());
+        ubahTargetBtn.setOnMouseEntered(e -> ubahTargetBtn.setStyle(btnLimeHover()));
+        ubahTargetBtn.setOnMouseExited(e  -> ubahTargetBtn.setStyle(btnLime()));
         ubahTargetBtn.setOnAction(e -> showUbahTargetDialog(tabungan.getId(), targetAmount, target, savingDAO));
 
         Region spacerTarget = new Region();
@@ -117,50 +147,68 @@ public class TabunganScene {
         targetRow.setAlignment(Pos.CENTER_LEFT);
 
         // Progress Bar
-        double pct = tabungan.getProgressPercentage() / 100;
-        Label terkumpulLabel = new Label("Sudah terkumpul");
-        Label pctLabel = new Label(Math.round(pct * 100) + "%");
+        HBox barBg = new HBox();
+        barBg.setMaxWidth(Double.MAX_VALUE);
+        barBg.setPrefHeight(12);
+        barBg.setStyle("-fx-background-color: " + NAVY_SURFACE + "; -fx-background-radius: 8;");
 
-        Region spacerP = new Region();
-        HBox.setHgrow(spacerP, Priority.ALWAYS);
+        HBox barFill = new HBox();
+        barFill.setPrefHeight(12);
+        barFill.setStyle("-fx-background-color: " + FIRST_OF_SPRING + "; -fx-background-radius: 8;");
+        barBg.widthProperty().addListener((obs, oldW, newW) ->
+            barFill.setPrefWidth(newW.doubleValue() * Math.min(1.0, pct))
+        );
 
-        HBox progLabelRow = new HBox(terkumpulLabel, spacerP, pctLabel);
-        ProgressBar progressBar = new ProgressBar(pct);
-        progressBar.setMaxWidth(Double.MAX_VALUE);
-        progressBar.setPrefHeight(20);
-        progressBar.setMinHeight(15);
+        StackPane progressBarPane = new StackPane(barBg, barFill);
+        progressBarPane.setMinHeight(12);
+        StackPane.setAlignment(barFill, Pos.CENTER_LEFT);
+        HBox.setHgrow(progressBarPane, Priority.ALWAYS);
 
-        // Status
-        Label statusLabel = new Label();
-        if (tabungan.isReached()) {
-            statusLabel.setText("Status: Target Tercapai");
-        } else {
-            statusLabel.setText("Status: Masih Menabung");
-        }
-        VBox progressSection = new VBox(4, progLabelRow, progressBar, statusLabel);
+        Label pctLabel = new Label("Sudah terkumpul " + pctInt + "%");
+        pctLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
 
-        double terkumpul = tabungan.getSavedAmount();
+        Label statusLabel = new Label(
+            tabungan.isReached() ? "Status: Target Tercapai" : "Status: Masih Menabung"
+        );
+        statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: " + WHITE_70 + "; -fx-font-style: italic;");
+
+        // Stat cards (3 kartu)
         double totalTabungan = new DepositDAO().getTotalDepositByUser(userId);
-        
-        VBox cardTerkumpul = makeMetricCard("Terkumpul", formatRupiah(terkumpul));
-        VBox cardSisa = makeMetricCard("Sisa Target", formatRupiah(tabungan.getRemaining()));
-        VBox cardTotal = makeMetricCard("Total Tabungan Keseluruhan", formatRupiah(totalTabungan));
+        VBox cardTerkumpul = makeStatCard("Terkumpul",                  formatRupiah(terkumpul),              false);
+        VBox cardSisa      = makeStatCard("Sisa Target",                formatRupiah(tabungan.getRemaining()), false);
+        VBox cardTotal     = makeStatCard("Total Tabungan Keseluruhan", formatRupiah(totalTabungan),           false);
+        HBox metricRow = new HBox(10, cardTerkumpul, cardSisa, cardTotal);
+        HBox.setHgrow(cardTerkumpul, Priority.ALWAYS); cardTerkumpul.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(cardSisa,      Priority.ALWAYS); cardSisa.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(cardTotal,     Priority.ALWAYS); cardTotal.setMaxWidth(Double.MAX_VALUE);
 
-        HBox metricRow = new HBox(12, cardTerkumpul, cardSisa, cardTotal);
-        HBox.setHgrow(cardTerkumpul, Priority.ALWAYS);
-        HBox.setHgrow(cardSisa, Priority.ALWAYS);
-        HBox.setHgrow(cardTotal, Priority.ALWAYS);
+        VBox progressCard = new VBox(10, targetRow, progressBarPane, pctLabel, statusLabel, metricRow);
+        progressCard.setStyle(
+            "-fx-background-color: " + NAVY_SURFACE + ";" +
+            "-fx-background-radius: 16; -fx-padding: 18 20 18 20;"
+        );
 
         // Form setor tabungan
         Label setorLabel = new Label("Setor Tabungan");
-        setorLabel.setStyle("-fx-font-weight: bold;");
+        setorLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
 
         TextField nominalField = new TextField();
         nominalField.setPromptText("Nominal (Rp)");
+        nominalField.setStyle(
+            "-fx-background-color: " + NAVY_CARD + ";" +
+            "-fx-text-fill: " + WHITE + "; -fx-prompt-text-fill: " + WHITE_40 + ";" +
+            "-fx-font-size: 13px; -fx-padding: 9 14;" +
+            "-fx-background-radius: 8; -fx-border-color: transparent; -fx-pref-height: 38;"
+        );
 
         Button tambahBtn = new Button("+ Tambah");
-        Label  msgLabel = new Label();
+        tambahBtn.setStyle(btnLime());
+        tambahBtn.setOnMouseEntered(e -> tambahBtn.setStyle(btnLimeHover()));
+        tambahBtn.setOnMouseExited(e  -> tambahBtn.setStyle(btnLime()));
 
+        Label  msgLabel = new Label();
+        msgLabel.setWrapText(true);
+        msgLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #FF6B6B;");
         // === Action Setor Tabungan ===
         tambahBtn.setOnAction(e -> {
             try {
@@ -197,7 +245,9 @@ public class TabunganScene {
                 msgLabel.setText("Masukkan angka yang valid.");
             }
         });
-        HBox setorInputRow = new HBox(8, nominalField, tambahBtn);
+        HBox setorInputRow = new HBox(10, nominalField, tambahBtn);
+        HBox.setHgrow(nominalField, Priority.ALWAYS);
+        setorInputRow.setAlignment(Pos.CENTER_LEFT);
 
         // Wishlist info
         Label wishlistTitle = new Label("Wishlist Aktif");
@@ -227,34 +277,47 @@ public class TabunganScene {
 
         // Left Side
         VBox leftBottom = new VBox(12, setorLabel, setorInputRow, msgLabel, wishlistCard);
-        leftBottom.setPrefWidth(280);
-        wishlistCard.setPadding(new Insets(10));
+        leftBottom.setPrefWidth(330);
+        leftBottom.setStyle(
+            "-fx-background-color: " + NAVY_SURFACE + ";" +
+            "-fx-background-radius: 16; -fx-padding: 18 20 18 20;"
+        );
 
         // Riwayat Deposit dari DB (Right Side)
         Label riwayatLabel = new Label("Riwayat Deposit");
-        riwayatLabel.setStyle("-fx-font-weight: bold;");
+        riwayatLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
 
         DateTimeFormatter tglFormatter =
             DateTimeFormatter.ofPattern("d MMM yyyy", new Locale("id", "ID"));
-
-        VBox depositList = new VBox(0);
+            VBox depositList = new VBox(4);
+            depositList.setStyle("-fx-background-color: transparent;");
+            
         if (deposits.isEmpty()) {
-            depositList.getChildren().add(new Label("Belum ada deposit bulan ini."));
+            Label emptyLbl = new Label("Belum ada deposit bulan ini.");
+            emptyLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: " + WHITE_40 + ";");
+            depositList.getChildren().add(emptyLbl);
         } else {
             for (Deposit d : deposits) {
                 Label amountLbl = new Label("+" + formatRupiah(d.getAmount()));
-                amountLbl.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                amountLbl.setStyle("-fx-text-fill: " + FIRST_OF_SPRING + "; -fx-font-weight: bold; -fx-font-size: 13px;");
 
                 Label dateLbl = new Label(d.getCreatedAt().format(tglFormatter));
-                dateLbl.setStyle("-fx-font-size: 12px;");
+                dateLbl.setStyle(
+                    "-fx-text-fill: " + WHITE_70 + "; -fx-font-size: 11px;" +
+                    "-fx-background-color: " + NAVY_SURFACE + ";" +
+                    "-fx-background-radius: 6; -fx-padding: 3 8;"
+                );
 
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
                 HBox row = new HBox(amountLbl, spacer, dateLbl);
-                row.setPadding(new Insets(8, 0, 8, 0));
                 row.setAlignment(Pos.CENTER_LEFT);
-                depositList.getChildren().addAll(row, new Separator());
+                row.setStyle(
+                    "-fx-background-color: " + NAVY_CARD + ";" +
+                    "-fx-background-radius: 8; -fx-padding: 9 12;"
+                );
+                depositList.getChildren().addAll(row);
             }
         }
 
@@ -263,63 +326,219 @@ public class TabunganScene {
         riwayatScroll.setFitToWidth(true);
         riwayatScroll.setPrefHeight(200);
         riwayatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-        VBox rightBottom = new VBox(10, riwayatLabel, riwayatScroll);
-        HBox.setHgrow(rightBottom, Priority.ALWAYS);
-        HBox bottomRow = new HBox(16, leftBottom, rightBottom);
-
-        page.getChildren().addAll(headerBox, new Separator(), targetRow,
-            progressSection, metricRow, bottomRow
+        riwayatScroll.setStyle(
+            "-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;"
         );
+
+        VBox.setVgrow(riwayatScroll, Priority.ALWAYS);
+
+        VBox rightBottom = new VBox(12, riwayatLabel, riwayatScroll);
+        rightBottom.setStyle(
+            "-fx-background-color: " + NAVY_SURFACE + ";" +
+            "-fx-background-radius: 16; -fx-padding: 18 20 18 20;"
+        );
+        HBox.setHgrow(rightBottom, Priority.ALWAYS);
+ 
+        HBox bottomRow = new HBox(12, leftBottom, rightBottom);
+        VBox.setVgrow(bottomRow, Priority.ALWAYS);
+ 
+        page.getChildren().addAll(headerBox, progressCard, bottomRow);
         return page;
     }
 
-    // === Card Box ===
-    private static VBox makeMetricCard(String label, String value) {
-        Label lbl = new Label(label);
-        Label val = new Label(value);
-        val.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        VBox card = new VBox(4, lbl, val);
-        card.setPadding(new Insets(12));
+    private static VBox buildWishlistCard(String wishlistAktif, double alokasi, double alokasiAmt) {
+        Label wishLabel = new Label("Wishlist Aktif");
+        wishLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
+        Label wishName = new Label(wishlistAktif);
+        wishName.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
+        VBox wishLeft = new VBox(2, wishLabel, wishName);
+ 
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+ 
+        Label alokasiLabel = new Label("Alokasi Wishlist");
+        alokasiLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
+        Label alokasiPctLabel = new Label((int) alokasi + "%");
+        alokasiPctLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + FIRST_OF_SPRING + ";");
+        VBox wishRight = new VBox(2, alokasiLabel, alokasiPctLabel);
+        wishRight.setAlignment(Pos.CENTER_RIGHT);
+ 
+        HBox topRow = new HBox(wishLeft, spacer, wishRight);
+        topRow.setAlignment(Pos.CENTER_LEFT);
+ 
+        Separator sep = new Separator();
+        sep.setStyle("-fx-background-color: " + WHITE_40 + "; -fx-opacity: 0.4;");
+ 
+        Label estimasiLabel = new Label("Estimasi bulan ini:");
+        estimasiLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
+        Label estimasiAmt = new Label(formatRupiah(alokasiAmt));
+        estimasiAmt.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
+ 
+        VBox card = new VBox(8, topRow, sep, estimasiLabel, estimasiAmt);
+        card.setStyle(
+            "-fx-background-color: " + NAVY_CARD + ";" +
+            "-fx-background-radius: 12; -fx-padding: 12 14;"
+        );
         return card;
     }
-
-    // === Tag Box ===
-    private static HBox makeTagBox(Label content) {
-        HBox box = new HBox(content);
-        box.setPadding(new Insets(2, 10, 2, 10));
-        return box;
+ 
+    // ── Stat card ─────────────────────────────────────────────────────
+    private static VBox makeStatCard(String label, String value, boolean limeAccent) {
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
+        Label val = new Label(value);
+        val.setStyle(
+            "-fx-font-size: 17px; -fx-font-weight: bold;" +
+            "-fx-text-fill: " + (limeAccent ? FIRST_OF_SPRING : WHITE) + ";"
+        );
+        VBox card = new VBox(4, lbl, val);
+        card.setStyle(
+            "-fx-background-color: " + NAVY_CARD + ";" +
+            "-fx-background-radius: 10; -fx-padding: 12 14;"
+        );
+        return card;
     }
+ 
+    // ── Button style helpers
+    private static String btnLime() {
+        return "-fx-background-color: " + FIRST_OF_SPRING + ";" +
+               "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+               "-fx-font-size: 13px; -fx-font-weight: bold;" +
+               "-fx-padding: 9 18; -fx-background-radius: 8;" +
+               "-fx-cursor: hand; -fx-pref-height: 38;";
+    }
+    private static String btnLimeHover() {
+        return "-fx-background-color: " + SPRING_DARK + ";" +
+               "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+               "-fx-font-size: 13px; -fx-font-weight: bold;" +
+               "-fx-padding: 9 18; -fx-background-radius: 8;" +
+               "-fx-cursor: hand; -fx-pref-height: 38;";
+    }
+ 
 
-    // === Action Form Field from Button "Ubah Target" ===
+    //  Dialog methods 
     private static void showUbahTargetDialog(int savingId, Label targetDisplay, double current, SavingDAO dao) {
         Dialog<Double> dialog = new Dialog<>();
-        dialog.setTitle("Ubah Target Bulanan");
-        dialog.setHeaderText("Target saat ini: " + formatRupiah(current));
+        dialog.setTitle("");
+        dialog.getDialogPane().setMinWidth(360);
+        dialog.getDialogPane().setMinHeight(280);
+        dialog.getDialogPane().setPrefWidth(380);
 
-        TextField inputField = new TextField();
-        inputField.setPromptText("Target baru (Rp)");
-        Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-
-        VBox content = new VBox(8, new Label("Masukkan target baru:"), inputField, errorLabel);
-        content.setPadding(new Insets(10));
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getStylesheets().add(
-            TabunganScene.class.getResource("/style.css").toExternalForm()
+        dialog.getDialogPane().setStyle(
+            "-fx-background-color: " + NAVY_SURFACE + ";" +
+            "-fx-background-radius: 16;" +
+            "-fx-border-radius: 16;" +
+            "-fx-padding: 0;"
         );
 
-        ButtonType saveType = new ButtonType("Simpan", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelType = new ButtonType("Batal", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveType, cancelType);
+        // dialog.getDialogPane().setHeader(null);
+        // dialog.getDialogPane().setGraphic(null);
 
+        
+        Label titleLbl = new Label("Ubah Target");
+        titleLbl.setStyle(
+            "-fx-background-color: " + FIRST_OF_SPRING + ";" +
+            "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+            "-fx-font-size: 14px; -fx-font-weight: bold;" +
+            "-fx-padding: 8 20; -fx-background-radius: 8;"
+        );
+
+        VBox.setMargin(titleLbl, new Insets(10,0,0,0));
+
+        Label subtitleLbl = new Label("Target saat ini: " + formatRupiah(current));
+        subtitleLbl.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + WHITE_70 + ";");
+
+        // input 
+        Label inputLabel = new Label("Masukkan target baru:");
+        inputLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: " + WHITE_70 + ";");
+ 
+        TextField inputField = new TextField();
+        inputField.setPromptText("Nominal (Rp)");
+        inputField.setStyle(
+            "-fx-background-color: " + NAVY_CARD + ";" +
+            "-fx-text-fill: " + WHITE + ";" +
+            "-fx-prompt-text-fill: " + WHITE_40 + ";" +
+            "-fx-font-size: 13px; -fx-padding: 10 14;" +
+            "-fx-background-radius: 8; -fx-border-color: transparent;" +
+            "-fx-pref-height: 40;"
+        );
+
+        inputField.setMaxWidth(Double.MAX_VALUE);
+ 
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: #FF6B6B; -fx-font-size: 12px;");
+        errorLabel.setWrapText(true);
+ 
+        dialog.getDialogPane().setHeader(null);
+        dialog.getDialogPane().setGraphic(null);
+        VBox content = new VBox(10, titleLbl, subtitleLbl, inputLabel, inputField, errorLabel);
+        content.setStyle("-fx-padding: 0 20 10 20;");
+        dialog.getDialogPane().setContent(content);
+ 
+        ButtonType cancelType = new ButtonType("Keluar",  ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType saveType   = new ButtonType("Simpan", ButtonBar.ButtonData.NEXT_FORWARD);
+        dialog.getDialogPane().getButtonTypes().addAll(cancelType, saveType);
+ 
         Button simpanBtn = (Button) dialog.getDialogPane().lookupButton(saveType);
         Button cancelBtn = (Button) dialog.getDialogPane().lookupButton(cancelType);
-        simpanBtn.getStyleClass().add("buttonOK");
-        cancelBtn.getStyleClass().add("buttonCancel");
 
+        simpanBtn.setMinWidth(100);
+        cancelBtn.setMinWidth(100);
+
+ 
+        simpanBtn.setStyle(
+            "-fx-background-color: " + FIRST_OF_SPRING + ";" +
+            "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+            "-fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 10 28; -fx-background-radius: 8; -fx-cursor: hand;"
+        );
+        simpanBtn.setOnMouseEntered(e -> simpanBtn.setStyle(
+            "-fx-background-color: " + SPRING_DARK + ";" +
+            "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+            "-fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 10 28; -fx-background-radius: 8; -fx-cursor: hand;"
+        ));
+        simpanBtn.setOnMouseExited(e -> simpanBtn.setStyle(
+            "-fx-background-color: " + FIRST_OF_SPRING + ";" +
+            "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+            "-fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 10 28; -fx-background-radius: 8; -fx-cursor: hand;"
+        ));
+ 
+        cancelBtn.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-text-fill: " + WHITE + ";" +
+            "-fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 10 28; -fx-background-radius: 8;" +
+            "-fx-border-color: " + WHITE_40 + "; -fx-border-radius: 8; -fx-cursor: hand;"
+        );
+        cancelBtn.setOnMouseEntered(e -> cancelBtn.setStyle(
+            "-fx-background-color: " + NAVY_CARD + ";" +
+            "-fx-text-fill: " + WHITE + ";" +
+            "-fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 10 28; -fx-background-radius: 8;" +
+            "-fx-border-color: " + WHITE_40 + "; -fx-border-radius: 8; -fx-cursor: hand;"
+        ));
+        cancelBtn.setOnMouseExited(e -> cancelBtn.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-text-fill: " + WHITE + ";" +
+            "-fx-font-size: 13px; -fx-font-weight: bold;" +
+            "-fx-padding: 10 28; -fx-background-radius: 8;" +
+            "-fx-border-color: " + WHITE_40 + "; -fx-border-radius: 8; -fx-cursor: hand;"
+        ));
+
+         dialog.getDialogPane().lookup(".button-bar").setStyle(
+            "-fx-background-color: " + NAVY_SURFACE + ";" +
+            "-fx-padding: 10 20 20 20;"
+        );
+
+        cancelBtn.addEventFilter(ActionEvent.ACTION, e -> {
+            dialog.close();
+        });
+ 
         simpanBtn.disableProperty().bind(inputField.textProperty().isEmpty());
-        // Action triggered
+
+
         simpanBtn.addEventFilter(ActionEvent.ACTION, event -> {
             try {
                 double newTarget = Double.parseDouble(inputField.getText().trim());
@@ -330,7 +549,6 @@ public class TabunganScene {
                 }
                 boolean ok = dao.updateTargetAmount(savingId, newTarget);
                 if (ok) {
-                    // targetDisplay.setText(formatRupiah(newTarget));
                     MainScene.refresh();
                 } else {
                     errorLabel.setText("Gagal menyimpan, coba lagi.");
@@ -341,10 +559,11 @@ public class TabunganScene {
                 event.consume();
             }
         });
-
+ 
         dialog.setResultConverter(btn -> null);
         dialog.showAndWait();
     }
+ 
 
     // === Action Form Field Create a Saving ===
     // Kolom formulir tentukan target tabungan yang muncul setelah user login dan terdeteksi belum memiliki tabungan

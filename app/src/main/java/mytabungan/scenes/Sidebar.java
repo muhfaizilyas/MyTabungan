@@ -37,9 +37,9 @@ public class Sidebar {
         VBox logoBox = buildLogoBox();
 
         // Menu Buttons
-        Button tabunganButton = createMenuButton("/images/iconmytabungan.png", "My Tabungan");
-        Button wishlistButton = createMenuButton("/images/icon wishlist.png", "My Wishlist");
-        Button growthButton   = createMenuButton("/images/icon growth.png",   "My Growth");
+        Button tabunganButton = createMenuButton("/images/iconmytabungan.png", "MyTabungan");
+        Button wishlistButton = createMenuButton("/images/icon_wishlist.png", "MyWishlist");
+        Button growthButton   = createMenuButton("/images/icon_growth.png",   "MyGrowth");
         Button[] navButtons = { tabunganButton, wishlistButton, growthButton };
 
         VBox menuBox = new VBox(8, tabunganButton, wishlistButton, growthButton);
@@ -162,7 +162,7 @@ public class Sidebar {
     private static Button createMenuButton(String iconPath, String text) {
         return buildButton(iconPath, text);
     }
-    
+
     private static Button createLogoutButton(String iconPath, String text) {
         return buildButton(iconPath, text);
     }
