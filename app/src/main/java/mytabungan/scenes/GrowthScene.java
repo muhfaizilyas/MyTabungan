@@ -73,7 +73,7 @@ public class GrowthScene {
         HBox profileBox = new HBox(12, avatar, greetingBox);
         profileBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label namafitur = new Label("MyTabungan");
+        Label namafitur = new Label("MyGrowth");
         namafitur.setStyle(
                 "-fx-background-color: " + FIRST_OF_SPRING + ";" +
                 "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
