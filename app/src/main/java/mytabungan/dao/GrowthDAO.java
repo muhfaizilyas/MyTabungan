@@ -25,7 +25,7 @@ public class GrowthDAO {
         int nextLevelPoints = getNextLevelTarget(level);
 
         return new UserStats(points,level,levelName,nextLevelPoints,streak,totalDeposit,
-        depositCount,avgDeposit,getAchievements(userId));
+        depositCount,avgDeposit,getAchievements(userId),getMotivationMessage(streak, level));
     }
 
     public List<Achievement> getAchievements(int userId) {
@@ -66,10 +66,6 @@ public class GrowthDAO {
         );
 
         return achievements;
-    }
-
-    public List<ChartData> getMonthlyChart(int userId) {
-        return new ArrayList<>();
     }
 
     private int calculatePoints(int depositCount,int streak,int wishlistCount,int reachedWishlist) {
@@ -138,6 +134,19 @@ public class GrowthDAO {
         return streak;
     }
 
+    private String getMotivationMessage(int streak, int level) {
+        if (streak >= 7) {
+            return "Luar biasa! Kamu konsisten menabung setiap hari.";
+        }
+        if (level >= 4) {
+            return "Sedikit lagi menuju Sultan Desa!";
+        }
+        if (streak >= 3) {
+            return "Pertahankan streak-mu!";
+        }
+        return "Mulai dari kecil, konsisten adalah kunci.";
+    }
+
     // Method Helper
     private int getDepositCount(int userId) {
         DepositDAO dao = new DepositDAO();
@@ -160,5 +169,31 @@ public class GrowthDAO {
     private int getReachedWishlistCount(int userId) {
         WishlistDAO dao = new WishlistDAO();
         return dao.getReachedWishlistsByUserId(userId).size();
+    }
+
+    public List<ChartData> getMonthlyChart(int userId) {
+        DepositDAO depositDAO = new DepositDAO();
+        List<Deposit> deposits = depositDAO.getDepositsByUserId(userId);
+
+        double[] monthlyTotals = new double[12];
+        for (Deposit d : deposits) {
+            int month = d.getCreatedAt().getMonthValue();
+            monthlyTotals[month - 1] += d.getAmount();
+        }
+
+        String[] labels = {
+            "Jan","Feb","Mar","Apr","Mei","Jun",
+            "Jul","Agu","Sep","Okt","Nov","Des"
+        };
+        List<ChartData> chart = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            chart.add(
+                new ChartData(
+                    labels[i],
+                    monthlyTotals[i]
+                )
+            );
+        }
+        return chart;
     }
 }
