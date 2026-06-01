@@ -14,7 +14,6 @@ public class DBIniatializer {
                 + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
             + ");";
 
-        // Silakan ubah komponen tabelnya sesuai kebutuhan kalian yaa, ini sebagai contoh aja
         String createMonthlySavings =
             "CREATE TABLE IF NOT EXISTS tabungan_utama ("
                 + "id INT PRIMARY KEY AUTO_INCREMENT,"
@@ -26,7 +25,6 @@ public class DBIniatializer {
                 + "FOREIGN KEY (user_id) REFERENCES users(id)"
             + ");";
 
-        // Silakan ubah komponen tabelnya sesuai kebutuhan kalian yaa, ini sebagai contoh aja
         String createWishlistTable =
             "CREATE TABLE IF NOT EXISTS wishlists ("
                 + "id INT PRIMARY KEY AUTO_INCREMENT,"
@@ -41,22 +39,20 @@ public class DBIniatializer {
                 + "FOREIGN KEY (user_id) REFERENCES users(id)"
             + ");";
 
-        // Silakan ubah komponen tabelnya sesuai kebutuhan kalian yaa, ini sebagai contoh aja
-        String createChallengesTable =
-            "CREATE TABLE IF NOT EXISTS challenges ("
-                + "id INT PRIMARY KEY AUTO_INCREMENT,"
-                + "user_id INT NOT NULL,"
-                + "title VARCHAR(100) NOT NULL,"
-                + "estimated_saving DECIMAL(12,2) DEFAULT 0,"
-                + "status VARCHAR(20) DEFAULT 'ONGOING',"
-                + "streak INT DEFAULT 0,"
-                + "start_date DATE,"
-                + "end_date DATE,"
-                + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + "FOREIGN KEY (user_id) REFERENCES users(id)"
-            + ");";
+        // String createChallengesTable =
+        //     "CREATE TABLE IF NOT EXISTS challenges ("
+        //         + "id INT PRIMARY KEY AUTO_INCREMENT,"
+        //         + "user_id INT NOT NULL,"
+        //         + "title VARCHAR(100) NOT NULL,"
+        //         + "estimated_saving DECIMAL(12,2) DEFAULT 0,"
+        //         + "status VARCHAR(20) DEFAULT 'ONGOING',"
+        //         + "streak INT DEFAULT 0,"
+        //         + "start_date DATE,"
+        //         + "end_date DATE,"
+        //         + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+        //         + "FOREIGN KEY (user_id) REFERENCES users(id)"
+        //     + ");";
 
-        // Silakan ubah komponen tabelnya sesuai kebutuhan kalian yaa, ini sebagai contoh aja
         String createDepositsTable =
             "CREATE TABLE IF NOT EXISTS deposits ("
                 + "id INT PRIMARY KEY AUTO_INCREMENT,"
@@ -75,7 +71,7 @@ public class DBIniatializer {
             statement.execute(createUsersTable);
             statement.execute(createMonthlySavings);
             statement.execute(createWishlistTable);
-            statement.execute(createChallengesTable);
+            // statement.execute(createChallengesTable);
             statement.execute(createDepositsTable);
 
             System.out.println("Semua tabel telah tersedia!");

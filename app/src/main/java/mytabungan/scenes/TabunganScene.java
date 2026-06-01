@@ -10,7 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Circle;
+// import javafx.scene.shape.Circle;
 import mytabungan.dao.*;
 import mytabungan.models.*;
 import mytabungan.utils.SessionManager;
@@ -80,7 +80,6 @@ public class TabunganScene {
         page.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         page.setStyle("-fx-backround-color:" + NAVY_CARD + ";");
         
-
         
         // Header
         StackPane avatar = new StackPane();
@@ -232,7 +231,7 @@ public class TabunganScene {
                 boolean updateSaving = savingDAO.updateSavingAmount(tabungan.getId(), nominal);
                 boolean saveDeposit = depositDAO.addDeposit(new Deposit( 0, userId,
                     "MAIN_SAVING", tabungan.getId(), nominal, null));
-
+                    
                 if (updateSaving && saveDeposit) {
                     msgLabel.setText("Berhasil menabung!");
                     nominalField.clear();
@@ -362,18 +361,18 @@ public class TabunganScene {
         alokasiPctLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + FIRST_OF_SPRING + ";");
         VBox wishRight = new VBox(2, alokasiLabel, alokasiPctLabel);
         wishRight.setAlignment(Pos.CENTER_RIGHT);
- 
+
         HBox topRow = new HBox(wishLeft, spacer, wishRight);
         topRow.setAlignment(Pos.CENTER_LEFT);
- 
+
         Separator sep = new Separator();
         sep.setStyle("-fx-background-color: " + WHITE_40 + "; -fx-opacity: 0.4;");
- 
+
         Label estimasiLabel = new Label("Estimasi bulan ini:");
         estimasiLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
         Label estimasiAmt = new Label(formatRupiah(alokasiAmt));
         estimasiAmt.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
- 
+
         VBox card = new VBox(8, topRow, sep, estimasiLabel, estimasiAmt);
         card.setStyle(
             "-fx-background-color: " + NAVY_CARD + ";" +
@@ -382,7 +381,7 @@ public class TabunganScene {
         return card;
     }
  
-    // ── Stat card ─────────────────────────────────────────────────────
+    // Stat card
     private static VBox makeStatCard(String label, String value, boolean limeAccent) {
         Label lbl = new Label(label);
         lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: " + WHITE_70 + ";");
@@ -398,21 +397,21 @@ public class TabunganScene {
         );
         return card;
     }
- 
-    // ── Button style helpers
+
+    // Button style helpers
     private static String btnLime() {
         return "-fx-background-color: " + FIRST_OF_SPRING + ";" +
-               "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
-               "-fx-font-size: 13px; -fx-font-weight: bold;" +
-               "-fx-padding: 9 18; -fx-background-radius: 8;" +
-               "-fx-cursor: hand; -fx-pref-height: 38;";
-    }
+                "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+                "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-padding: 9 18; -fx-background-radius: 8;" +
+                "-fx-cursor: hand; -fx-pref-height: 38;";
+        }
     private static String btnLimeHover() {
         return "-fx-background-color: " + SPRING_DARK + ";" +
-               "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
-               "-fx-font-size: 13px; -fx-font-weight: bold;" +
-               "-fx-padding: 9 18; -fx-background-radius: 8;" +
-               "-fx-cursor: hand; -fx-pref-height: 38;";
+                "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
+                "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-padding: 9 18; -fx-background-radius: 8;" +
+                "-fx-cursor: hand; -fx-pref-height: 38;";
     }
  
 
@@ -434,7 +433,6 @@ public class TabunganScene {
         // dialog.getDialogPane().setHeader(null);
         // dialog.getDialogPane().setGraphic(null);
 
-        
         Label titleLbl = new Label("Ubah Target");
         titleLbl.setStyle(
             "-fx-background-color: " + FIRST_OF_SPRING + ";" +
@@ -451,7 +449,7 @@ public class TabunganScene {
         // input 
         Label inputLabel = new Label("Masukkan target baru:");
         inputLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: " + WHITE_70 + ";");
- 
+
         TextField inputField = new TextField();
         inputField.setPromptText("Nominal (Rp)");
         inputField.setStyle(
@@ -464,28 +462,25 @@ public class TabunganScene {
         );
 
         inputField.setMaxWidth(Double.MAX_VALUE);
- 
+
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: #FF6B6B; -fx-font-size: 12px;");
         errorLabel.setWrapText(true);
- 
+
         dialog.getDialogPane().setHeader(null);
         dialog.getDialogPane().setGraphic(null);
         VBox content = new VBox(10, titleLbl, subtitleLbl, inputLabel, inputField, errorLabel);
         content.setStyle("-fx-padding: 0 20 10 20;");
         dialog.getDialogPane().setContent(content);
- 
+
         ButtonType cancelType = new ButtonType("Keluar",  ButtonBar.ButtonData.CANCEL_CLOSE);
         ButtonType saveType   = new ButtonType("Simpan", ButtonBar.ButtonData.NEXT_FORWARD);
         dialog.getDialogPane().getButtonTypes().addAll(cancelType, saveType);
- 
         Button simpanBtn = (Button) dialog.getDialogPane().lookupButton(saveType);
         Button cancelBtn = (Button) dialog.getDialogPane().lookupButton(cancelType);
 
         simpanBtn.setMinWidth(100);
         cancelBtn.setMinWidth(100);
-
- 
         simpanBtn.setStyle(
             "-fx-background-color: " + FIRST_OF_SPRING + ";" +
             "-fx-text-fill: " + MIDNIGHT_MIRAGE + ";" +
@@ -504,7 +499,7 @@ public class TabunganScene {
             "-fx-font-size: 13px; -fx-font-weight: bold;" +
             "-fx-padding: 10 28; -fx-background-radius: 8; -fx-cursor: hand;"
         ));
- 
+
         cancelBtn.setStyle(
             "-fx-background-color: transparent;" +
             "-fx-text-fill: " + WHITE + ";" +
@@ -527,7 +522,7 @@ public class TabunganScene {
             "-fx-border-color: " + WHITE_40 + "; -fx-border-radius: 8; -fx-cursor: hand;"
         ));
 
-         dialog.getDialogPane().lookup(".button-bar").setStyle(
+        dialog.getDialogPane().lookup(".button-bar").setStyle(
             "-fx-background-color: " + NAVY_SURFACE + ";" +
             "-fx-padding: 10 20 20 20;"
         );
@@ -535,9 +530,7 @@ public class TabunganScene {
         cancelBtn.addEventFilter(ActionEvent.ACTION, e -> {
             dialog.close();
         });
- 
         simpanBtn.disableProperty().bind(inputField.textProperty().isEmpty());
-
 
         simpanBtn.addEventFilter(ActionEvent.ACTION, event -> {
             try {
@@ -559,11 +552,11 @@ public class TabunganScene {
                 event.consume();
             }
         });
- 
+
         dialog.setResultConverter(btn -> null);
         dialog.showAndWait();
     }
- 
+
 
     // === Action Form Field Create a Saving ===
     // Kolom formulir tentukan target tabungan yang muncul setelah user login dan terdeteksi belum memiliki tabungan

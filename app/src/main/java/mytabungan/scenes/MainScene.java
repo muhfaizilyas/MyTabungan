@@ -6,10 +6,12 @@ import javafx.stage.Stage;
 
 public class MainScene {
     private static BorderPane root;
+    public enum Page { TABUNGAN, WISHLIST, GROWTH }
+    private static Page currentPage = Page.TABUNGAN;
 
     public static Scene getMain(Stage stage) {
         root = new BorderPane();
-        root.setStyle("-fx-background-color: #0A2D5A");
+        root.setStyle("-fx-background-color: #0A2D5A;");
         root.setLeft(
             Sidebar.buildSidebar(root, stage)
         );
@@ -24,7 +26,15 @@ public class MainScene {
         return scene;
     }
 
+    public static void setCurrentPage(Page page) {
+        currentPage = page;
+    }
+    
     public static void refresh() {
-        root.setCenter(TabunganScene.buildPage());
+        switch (currentPage) {
+            case TABUNGAN -> root.setCenter(TabunganScene.buildPage());
+            case WISHLIST -> root.setCenter(WishlistScene.buildPage());
+            case GROWTH   -> root.setCenter(GrowthScene.buildPage());
+        }
     }
 }

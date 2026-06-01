@@ -43,10 +43,10 @@ public class Wishlist extends Saving {
     }
 
     public double calculateMonthlyLimit(MonthlySaving monthlySaving) {
-        double percentage = Math.min(maxLimit, 50);
-        return monthlySaving.getTargetAmount() * (percentage / 100);
+        double percentage = Math.min(maxLimit, 70);
+        return monthlySaving.getSavedAmount() * (percentage / 100);
     }
-    
+
     public double calculateAllocation(double totalSaving) {
         return totalSaving * maxLimit / 100;
     }
@@ -56,7 +56,7 @@ public class Wishlist extends Saving {
         if (targetAmount == 0) {
             return 0;
         }
-        return Math.min(0, (savedAmount / targetAmount) * 100);
+        return Math.min(100, (savedAmount / targetAmount) * 100);
     }
 
     @Override

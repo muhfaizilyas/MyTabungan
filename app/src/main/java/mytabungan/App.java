@@ -6,6 +6,7 @@ package mytabungan;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import mytabungan.scenes.LoginScene;
+// import mytabungan.database.DBIniatializer;
 
 public class App  extends Application{
 

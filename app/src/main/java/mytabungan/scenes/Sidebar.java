@@ -47,9 +47,16 @@ public class Sidebar {
 
         setActive(tabunganButton, navButtons);
         root.setCenter(TabunganScene.buildPage());
-        tabunganButton.setOnAction(e -> { setActive(tabunganButton, navButtons); root.setCenter(TabunganScene.buildPage());});
-        wishlistButton.setOnAction(e -> {setActive(wishlistButton, navButtons); root.setCenter(WishlistScene.buildPage());});
-        growthButton.setOnAction(e -> { setActive(growthButton, navButtons); root.setCenter(GrowthScene.buildPage());});
+        MainScene.setCurrentPage(MainScene.Page.TABUNGAN);
+        tabunganButton.setOnAction(e -> { setActive(tabunganButton, navButtons); MainScene.setCurrentPage(MainScene.Page.TABUNGAN);
+            root.setCenter(TabunganScene.buildPage());
+        });
+        wishlistButton.setOnAction(e -> {setActive(wishlistButton, navButtons); MainScene.setCurrentPage(MainScene.Page.WISHLIST);
+            root.setCenter(WishlistScene.buildPage());
+        });
+        growthButton.setOnAction(e -> { setActive(growthButton, navButtons); MainScene.setCurrentPage(MainScene.Page.GROWTH);
+            root.setCenter(GrowthScene.buildPage());
+        });
 
         // Spacer
         Region spacer = new Region();
