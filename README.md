@@ -124,6 +124,7 @@ Database connection settings are loaded from the `db.properties` file instead of
 
 ### 1. Encapsulation
 **Location:** `app/src/main/java/mytabungan/models/`
+
 All fields within model classes are declared as private, preventing direct access from outside the class. Data can only be accessed through the provided getter methods.
 
 **Example in `User.java`:**
@@ -156,6 +157,7 @@ Encapsulation is also applied in `DatabaseConfig.java`, where database connectio
 
 ### 2. Inheritance
 **Location:** `app/src/main/java/mytabungan/models/`
+
 `MonthlySaving` and `Wishlist` are subclasses that extend the abstract class `Saving`. Through inheritance, both subclasses can reuse common attributes and methods defined in `Saving` without duplicating code.
 
 **Inheritance hierarchy:**
@@ -213,6 +215,7 @@ This inheritance structure promotes code reuse and simplifies maintenance by cen
 
 ### 3. Polymorphism
 **Location:** `app/src/main/java/mytabungan/models/`
+
 Polymorphism is implemented through the abstract methods `isReached()`, `getRemaining()`, and `getProgressPercentage()` declared in `Saving` and overridden by both `MonthlySaving` and `Wishlist`.
 Although the methods share the same signatures, each subclass provides its own implementation according to its business logic and context. This allows objects of different subclasses to be treated as instances of `Saving` while still executing their respective implementations at runtime.
 
@@ -271,6 +274,7 @@ public double calculateAllocation(double totalSaving) {
 
 ### 4. Abstraction
 **Location:** `app/src/main/java/mytabungan/models/Saving.java`
+
 `Saving` is declared as an abstract class, meaning it cannot be instantiated directly. Instead, it acts as a blueprint that defines common attributes and behaviors shared by all saving-related entities.
 
 ```java
