@@ -9,6 +9,7 @@ public class MainScene {
 
     public static Scene getMain(Stage stage) {
         root = new BorderPane();
+        root.setStyle("-fx-background-color: #0A2D5A");
         root.setLeft(
             Sidebar.buildSidebar(root, stage)
         );
