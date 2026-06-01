@@ -1,18 +1,33 @@
 package mytabungan.scenes;
 
 import java.text.NumberFormat;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-// import javafx.scene.shape.Circle;
-import mytabungan.dao.*;
-import mytabungan.models.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import mytabungan.dao.DepositDAO;
+import mytabungan.dao.SavingDAO;
+import mytabungan.dao.WishlistDAO;
+import mytabungan.models.Deposit;
+import mytabungan.models.MonthlySaving;
+import mytabungan.models.Wishlist;
 import mytabungan.utils.SessionManager;
 
 public class TabunganScene {
@@ -79,7 +94,6 @@ public class TabunganScene {
         page.setPadding(new Insets(28, 32, 28, 32));
         page.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         page.setStyle("-fx-backround-color:" + NAVY_CARD + ";");
-        
         
         // Header
         StackPane avatar = new StackPane();
