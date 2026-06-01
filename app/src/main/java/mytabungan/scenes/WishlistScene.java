@@ -67,17 +67,9 @@ public class WishlistScene {
         VBox fiturBox = new VBox(2, namaFitur, tanggalLabel);
         fiturBox.setAlignment(Pos.CENTER_RIGHT);
 
-        Button distribusiBtn = new Button("Distribusi Tabungan");
-        distribusiBtn.setOnAction(e -> {
-            if (tabungan != null) {
-                wishlistDAO.distributeMonthlySaving(userId, tabungan.getSavedAmount());
-                MainScene.refresh();
-            }
-        });
-
         Region spacerH = new Region();
         HBox.setHgrow(spacerH, Priority.ALWAYS);
-        HBox headerBox = new HBox(10, profileBox, spacerH, distribusiBtn, fiturBox);
+        HBox headerBox = new HBox(10, profileBox, spacerH, fiturBox);
         headerBox.setAlignment(Pos.CENTER_LEFT);
 
         // === Metric Card ===
@@ -323,11 +315,11 @@ public class WishlistScene {
         dialog.setHeaderText("Sisa kapasitas alokasi: " + (int) sisaKapasitasPct + "%");
 
         TextField namaField    = new TextField();
-        namaField.setPromptText("Nama wishlist (contoh: HP baru)");
+        namaField.setPromptText("Nama wishlist");
         TextField targetField  = new TextField();
         targetField.setPromptText("Target harga (Rp)");
         TextField alokasiField = new TextField();
-        alokasiField.setPromptText("Alokasi dari tabungan (%) — maks " + (int) sisaKapasitasPct + "%");
+        alokasiField.setPromptText("Alokasi dari tabungan (%)");
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
